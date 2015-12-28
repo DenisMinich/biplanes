@@ -5,6 +5,7 @@ from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.widget import Widget
 from parabox.base_object import BaseObject
+from parabox.structures import ObjectsCollection
 
 from biplanes.entities import Plane
 from biplanes.settings import STATIC_PATH
@@ -16,10 +17,10 @@ Builder.load_file('game.kv')
 class Battlefield(BaseObject):
     def __init__(self, *args, **kwargs):
         super(Battlefield, self).__init__(*args, **kwargs)
-        self.add_widget(Plane(
-            size=(50, 50),
-            pos=(400, 300),
-            foreground='plane.png'))
+        self.objects = ObjectsCollection([
+            Plane(size=(35, 35), pos=(500, 300), foreground='red_plane.png'),
+            Plane(size=(35, 35), pos=(300, 300), foreground='blue_plane.png'),],
+            self)
 
 class GameApp(App):
    def build(self):

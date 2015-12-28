@@ -3,4 +3,6 @@ from parabox.visual import ImageView
 
 
 class Plane(Movable, ImageView):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Plane, self).__init__(*args, **kwargs)
+        self.add_to_collections(['planes'])
