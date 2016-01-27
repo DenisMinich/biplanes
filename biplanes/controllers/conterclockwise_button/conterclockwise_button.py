@@ -7,7 +7,7 @@ class ConterClockWiseButton(Widget):
         self.plane = plane
 
     def update_angle(self, *args):
-        self.plane.angle += 4
+        self.plane.angle += 3
 
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):

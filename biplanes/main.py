@@ -10,6 +10,7 @@ from parabox.structures import ObjectsCollection
 from biplanes.controllers import ClockWiseButton
 from biplanes.controllers import ConterClockWiseButton
 from biplanes.controllers import DownButton
+from biplanes.controllers import Info
 from biplanes.controllers import UpButton
 from biplanes.entities import Plane
 from biplanes.settings import STATIC_PATH
@@ -23,21 +24,38 @@ class Battlefield(BaseObject):
     def __init__(self, *args, **kwargs):
         super(Battlefield, self).__init__(*args, **kwargs)
         self.red_plane = Plane(
+            id="Red plane",
             size=(35, 35),
             pos=(500, 300),
-            speed_limit=5,
+            speed_limit_x=5,
+            speed_limit_y=5,
             foreground='red_plane.png')
+        self.red_plane.info = Info(
+            model=self.red_plane,
+            fields=['velocity', 'acceleration', 'pos'],
+            pos=(600, 450),
+            size=(100, 100))
         self.blue_plane = Plane(
+            id="Blue plane",
             size=(35, 35),
             pos=(300, 300),
-            speed_limit=5,
+            speed_limit_x=4,
+            speed_limit_y=4,
+            #resistance_x=.01,
+            #resistance_y=.01,
             foreground='blue_plane.png')
+        self.blue_plane.info = Info(
+            model=self.blue_plane,
+            fields=['velocity', 'acceleration', 'pos'],
+            pos=(100, 450),
+            size=(100, 100))
         self.objects = ObjectsCollection([
-            self.red_plane, self.blue_plane],
+            self.red_plane, self.blue_plane,
+            self.red_plane.info, self.blue_plane.info],
             parent_widget=self)
         self.phisics = ObjectsCollection([
             PlainPhisics(
-                gravity=(0, -.5),
+                gravity=(0, -.2),
                 affect_objects=Collector.get_collection('planes'))],
             self)
         self.add_widget(UpButton(self.blue_plane))
