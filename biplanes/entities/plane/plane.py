@@ -1,3 +1,5 @@
+from kivy import Logger
+from kivy.vector import Vector
 from parabox.behaviour import Movable
 from parabox.phisics import PlainPhisics
 from parabox.structures import ObjectsCollection
@@ -12,10 +14,14 @@ class Plane(Movable, ImageView):
         self.inner_phisics = ObjectsCollection([self.engine], self)
         self.bind(on_move=self._return_to_scene)
         self.bind(on_update=self.restrict_power)
-        self.bind(on_update=self.rotate_engine)
+        self.bind(on_rotate=self.rotate_engine)
+        self.bind(on_rotate=self.change_direction)
 
     def rotate_engine(self, *args):
         self.engine.angle = self.angle
+
+    def change_direction(self, instance, new_angle, diff):
+        self.velocity = Vector(self.velocity).rotate(diff)
 
     def restrict_power(self, *args):
         if self.engine.gravity.x > 1:

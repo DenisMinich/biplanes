@@ -27,8 +27,8 @@ class Battlefield(BaseObject):
             id="Red plane",
             size=(35, 35),
             pos=(500, 300),
-            speed_limit_x=5,
-            speed_limit_y=5,
+            speed_limit_x=4,
+            speed_limit_y=4,
             foreground='red_plane.png')
         self.red_plane.info = Info(
             model=self.red_plane,
@@ -41,8 +41,6 @@ class Battlefield(BaseObject):
             pos=(300, 300),
             speed_limit_x=4,
             speed_limit_y=4,
-            #resistance_x=.01,
-            #resistance_y=.01,
             foreground='blue_plane.png')
         self.blue_plane.info = Info(
             model=self.blue_plane,
@@ -55,7 +53,7 @@ class Battlefield(BaseObject):
             parent_widget=self)
         self.phisics = ObjectsCollection([
             PlainPhisics(
-                gravity=(0, -.2),
+                gravity=(0, -.05),
                 affect_objects=Collector.get_collection('planes'))],
             self)
         self.add_widget(UpButton(self.blue_plane))
