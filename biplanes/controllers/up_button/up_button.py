@@ -9,7 +9,7 @@ class UpButton(Widget):
 
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):
-            self.plane.engine.gravity = Vector(.05, 0)
+            self.plane.bind(on_update=self.plane.increase_velocity)
 
     def on_touch_up(self, touch):
-        self.plane.engine.gravity = Vector(0, 0)
+        self.plane.unbind(on_update=self.plane.increase_velocity)

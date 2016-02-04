@@ -7,12 +7,9 @@ class DownButton(Widget):
         super(DownButton, self).__init__(*args, **kwargs)
         self.plane = plane
 
-    def update_engine(self, *args):
-        self.plane.engine.gravity += Vector(-.04, 0)
-
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):
-            self.plane.bind(on_update=self.update_engine)
+            self.plane.bind(on_update=self.plane.decrease_velocity)
 
     def on_touch_up(self, touch):
-        self.plane.unbind(on_update=self.update_engine)
+        self.plane.unbind(on_update=self.plane.decrease_velocity)

@@ -7,7 +7,11 @@ class Info(BaseObject):
     def get_text(self):
         text = "Object: %s\n\n" % self.model.id
         for field in self.fields:
-            text += "%s - %s\n" % (field, getattr(self.model, field, "no attr"))
+            steps = field.split('.')
+            value = self.model
+            for step in filter(bool, steps):
+                value = getattr(value, step, None)
+            text += "%s - %s\n" % (field, value)
         return text
 
     def set_text(self, value):
