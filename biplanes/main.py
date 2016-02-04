@@ -24,28 +24,12 @@ Builder.load_file('game.kv')
 class Battlefield(BaseObject):
     def __init__(self, *args, **kwargs):
         super(Battlefield, self).__init__(*args, **kwargs)
-        self.red_plane = Plane(
-            id="Red plane",
-            pos=(500, 300),
-            foreground='red_plane.png')
-        self.red_plane.info = Info(
-            model=self.red_plane,
-            fields=['velocity', 'acceleration', 'pos'],
-            pos=(600, 450),
-            size=(100, 100))
         self.blue_plane = Plane(
             id="Blue plane",
-            pos=(300, 300),
+            pos=(40, 40),
             foreground='blue_plane.png')
-        self.blue_plane.info = Info(
-            model=self.blue_plane,
-            fields=['velocity', 'pos', 'fixed_velocity', 'in_air', 'lift.gravity'],
-            pos=(100, 450),
-            size=(300, 100))
-        self.objects = ObjectsCollection([
-            self.red_plane, self.blue_plane,
-            self.red_plane.info, self.blue_plane.info],
-            parent_widget=self)
+        self.objects = ObjectsCollection(
+            [self.blue_plane],parent_widget=self)
         self.phisics = ObjectsCollection([
             PlainPhisics(
                 gravity=(0, -GLOBAL_GRAVITY),
