@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy.logger import Logger
 from kivy.resources import resource_add_path
 from parabox.base_object import BaseObject
 from parabox.phisics import PlainPhisics
@@ -10,6 +11,7 @@ from parabox.structures import ObjectsCollection
 from biplanes.controllers import ClockWiseButton
 from biplanes.controllers import ConterClockWiseButton
 from biplanes.controllers import DownButton
+from biplanes.controllers import FireButton
 from biplanes.controllers import Info
 from biplanes.controllers import UpButton
 from biplanes.entities import Plane
@@ -28,8 +30,12 @@ class Battlefield(BaseObject):
             id="Blue plane",
             pos=(40, 40),
             foreground='blue_plane.png')
-        self.objects = ObjectsCollection(
-            [self.blue_plane],parent_widget=self)
+        self.planes = ObjectsCollection(
+            Collector.get_collection('planes'),
+            parent_widget=self)
+        self.bullets = ObjectsCollection(
+            Collector.get_collection('bullets'),
+            parent_widget=self)
         self.phisics = ObjectsCollection([
             PlainPhisics(
                 gravity=(0, -GLOBAL_GRAVITY),
@@ -39,6 +45,7 @@ class Battlefield(BaseObject):
         self.add_widget(DownButton(self.blue_plane))
         self.add_widget(ClockWiseButton(self.blue_plane))
         self.add_widget(ConterClockWiseButton(self.blue_plane))
+        self.add_widget(FireButton(self.blue_plane))
 
 
 class GameApp(App):

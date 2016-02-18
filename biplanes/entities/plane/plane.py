@@ -11,6 +11,7 @@ from biplanes.settings import MAX_SPEED_X
 from biplanes.settings import MAX_SPEED_Y
 from biplanes.settings import POWER_DOWNGRADE_RANGE
 from biplanes.settings import TAKEOFF_POINT
+from biplanes.entities.bullet.bullet import Bullet
 
 
 class Plane(Movable, ImageView):
@@ -70,3 +71,6 @@ class Plane(Movable, ImageView):
 
     def _get_fixed_velocity_vector(self):
         return Vector(self.fixed_velocity, 0).rotate(self.angle)
+
+    def fire(self):
+        return Bullet(owner=self)
