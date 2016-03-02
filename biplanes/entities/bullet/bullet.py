@@ -1,19 +1,20 @@
 from kivy.vector import Vector
+from kivy.uix.image import Image
 from parabox.behaviour import Movable
-from parabox.visual import ImageView
 
 from . import settings
 
 
-class Bullet(Movable, ImageView):
+class Bullet(Movable, Image):
     def __init__(self, *args, **kwargs):
         self.owner = kwargs.get('owner', None)
         super(Bullet, self).__init__(
             size=(5, 5),
             pos=self._get_start_position(),
             velocity=self._get_start_velocity(),
-            foreground='bullet.png')
+            source='bullet.png')
         self.add_to_collections(['bullets'])
+        self.add_to_collections(['game_objects'])
         self.bind(on_update=self._delete_on_out_from_scene)
 
     def _get_start_velocity(self):
@@ -35,6 +36,3 @@ class Bullet(Movable, ImageView):
                 or (self.y + self.size[1] > self.parent.size[1])
                 or (self.y < 0)):
             self.delete_from_collections()
-
-
-

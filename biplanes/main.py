@@ -28,30 +28,41 @@ class Battlefield(BaseObject):
         super(Battlefield, self).__init__(*args, **kwargs)
         self.blue_plane = Plane(
             id="Blue plane",
-            pos=(40, 40),
-            foreground='blue_plane.png')
-        self.planes = ObjectsCollection(
-            Collector.get_collection('planes'),
-            parent_widget=self)
-        self.bullets = ObjectsCollection(
-            Collector.get_collection('bullets'),
-            parent_widget=self)
-        self.phisics = ObjectsCollection([
-            PlainPhisics(
-                gravity=(0, -GLOBAL_GRAVITY),
-                affect_objects=Collector.get_collection('planes'))],
-            self)
+            start_pos=(40, 200),
+            source='blue_plane.png')
+        self.red_plane = Plane(
+            id="Red plane",
+            start_pos=(340, 200),
+            source='red_plane.png')
         self.add_widget(UpButton(self.blue_plane))
         self.add_widget(DownButton(self.blue_plane))
         self.add_widget(ClockWiseButton(self.blue_plane))
         self.add_widget(ConterClockWiseButton(self.blue_plane))
         self.add_widget(FireButton(self.blue_plane))
 
+    def on_touch_down(self, *args):
+        if self.red_plane.points:
+            self.red_plane.damage(1)
+
 
 class GameApp(App):
+
     def build(self):
         battlefield = Battlefield()
+        battlefield.phisics = ObjectsCollection([
+            PlainPhisics(
+                gravity=(0, -GLOBAL_GRAVITY),
+                affect_objects=Collector.get_collection('planes'))],
+            parent_widget=battlefield)
+        battlefield.objects = ObjectsCollection(
+            Collector.get_collection('game_objects'),
+            parent_widget=battlefield)
+        shadow = BaseObject()
+        shadow.objects = ObjectsCollection(
+            Collector.get_collection('hidden_objects'),
+            parent_widget=shadow)
         Clock.schedule_interval(battlefield.update, 1./60)
+        Clock.schedule_interval(shadow.update, 1./60)
         return battlefield
 
 if __name__ == "__main__":
