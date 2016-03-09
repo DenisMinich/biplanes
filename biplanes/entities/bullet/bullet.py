@@ -1,11 +1,13 @@
 from kivy.vector import Vector
 from kivy.uix.image import Image
+from parabox.behaviour import Collidable
 from parabox.behaviour import Movable
+from parabox.structures.collector import Collector
 
 from . import settings
 
 
-class Bullet(Movable, Image):
+class Bullet(Movable, Image, Collidable):
     def __init__(self, *args, **kwargs):
         self.owner = kwargs.get('owner', None)
         super(Bullet, self).__init__(
@@ -16,6 +18,7 @@ class Bullet(Movable, Image):
         self.add_to_collections(['bullets'])
         self.add_to_collections(['game_objects'])
         self.bind(on_update=self._delete_on_out_from_scene)
+        self.bind(on_collide=self._process_collissions)
 
     def _get_start_velocity(self):
         direction = Vector(1, 0).rotate(self.owner.angle).normalize()
@@ -35,4 +38,9 @@ class Bullet(Movable, Image):
                 or (self.x < 0)
                 or (self.y + self.size[1] > self.parent.size[1])
                 or (self.y < 0)):
+            self.delete_from_collections()
+
+    def _process_collissions(self, instance, collide_object):
+        if collide_object in Collector.get_collection('planes'):
+            collide_object.damage(1)
             self.delete_from_collections()

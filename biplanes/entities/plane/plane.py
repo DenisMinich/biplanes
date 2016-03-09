@@ -6,6 +6,7 @@ from kivy.properties import BoundedNumericProperty
 from kivy.properties import NumericProperty
 from kivy.vector import Vector
 from kivy.uix.image import Image
+from parabox.behaviour import Collidable
 from parabox.behaviour import Movable
 from parabox.phisics import PlainPhisics
 from parabox.structures import ObjectsCollection
@@ -15,7 +16,7 @@ from biplanes.entities.bullet.bullet import Bullet
 from biplanes.entities.plane import settings as plane_settings
 
 
-class Plane(Movable, Image):
+class Plane(Movable, Image, Collidable):
 
     STATE_ON_START = 1
     STATE_NORMAL = 2
@@ -37,9 +38,7 @@ class Plane(Movable, Image):
             speed_limit_x=plane_settings.MAX_SPEED_X,
             speed_limit_y=plane_settings.MAX_SPEED_Y,
             *args, **kwargs)
-        self.lift = PlainPhisics(
-            gravity=(0, global_settings.GLOBAL_GRAVITY),
-            affect_objects=[self])
+        self.lift = PlainPhisics(affect_objects=[self])
         self.inner_phisics = ObjectsCollection([self.lift], self)
         self.anim_delay = -.1
         self.anim_loop = 1
@@ -65,6 +64,7 @@ class Plane(Movable, Image):
         self.bind(on_update=self._return_to_scene)
         self.bind(fixed_velocity=self._check_takeoff_point)
         self.bind(fixed_velocity=self._update_lift)
+        self.lift.gravity = Vector(0, global_settings.GLOBAL_GRAVITY)
         self.pos = kwargs.get('start_pos')
         self.size = (35, 35)
         self.in_air = False
@@ -136,6 +136,9 @@ class Plane(Movable, Image):
         if self.state == self.STATE_NO_PILOT:
             self.source = 'red_plane.png'
         if self.state == self.STATE_BANG:
+            self.delete_from_collections(['planes'])
+            self.lift.gravity = Vector(0, 0)
+            self.move_stop()
             self.pos = (self.center_x - 32, self.center_y - 32)
             self.size = (64, 64)
             self.source = 'bang.gif'

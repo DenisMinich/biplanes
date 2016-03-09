@@ -40,10 +40,6 @@ class Battlefield(BaseObject):
         self.add_widget(ConterClockWiseButton(self.blue_plane))
         self.add_widget(FireButton(self.blue_plane))
 
-    def on_touch_down(self, *args):
-        if self.red_plane.points:
-            self.red_plane.damage(1)
-
 
 class GameApp(App):
 
