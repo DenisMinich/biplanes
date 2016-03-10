@@ -4,11 +4,13 @@ from kivy.logger import Logger
 from kivy.properties import BooleanProperty
 from kivy.properties import BoundedNumericProperty
 from kivy.properties import NumericProperty
+from kivy.properties import StringProperty
 from kivy.vector import Vector
 from kivy.uix.image import Image
 from parabox.behaviour import Collidable
 from parabox.behaviour import Movable
 from parabox.phisics import PlainPhisics
+from parabox.structures import Collector
 from parabox.structures import ObjectsCollection
 
 from biplanes import settings as global_settings
@@ -31,6 +33,7 @@ class Plane(Movable, Image, Collidable):
     fixed_velocity = BoundedNumericProperty(
         0, min=0, max=plane_settings.MAX_SPEED_X,
         errorhandler=lambda x: 0 if x < 0 else plane_settings.MAX_SPEED_X)
+    team = StringProperty()
 
     def __init__(self, *args, **kwargs):
         super(Plane, self).__init__(
@@ -42,6 +45,7 @@ class Plane(Movable, Image, Collidable):
         self.inner_phisics = ObjectsCollection([self.lift], self)
         self.anim_delay = -.1
         self.anim_loop = 1
+        self.allow_stretch = True
         self.start = partial(self._initialize, *args, **kwargs)
         self.start()
 
@@ -55,18 +59,23 @@ class Plane(Movable, Image, Collidable):
         return Bullet(owner=self)
 
     def damage(self, amount):
-        self.points -= amount
+        self.points = 0 if amount >= self.points else self.points - amount
+
+    def destroy(self):
+        self.points = 0
 
     def _initialize(self, *args, **kwargs):
+        self.team = kwargs.get('team')
         self.delete_from_collections(['hidden_objects'])
-        self.add_to_collections(['planes', 'game_objects'])
+        self.add_to_collections(['planes', 'game_objects', self.team])
         self.bind(on_update=self._apply_arteficial_velocity)
         self.bind(on_update=self._return_to_scene)
         self.bind(fixed_velocity=self._check_takeoff_point)
         self.bind(fixed_velocity=self._update_lift)
+        self.bind(on_collide=self._process_collissions)
         self.lift.gravity = Vector(0, global_settings.GLOBAL_GRAVITY)
         self.pos = kwargs.get('start_pos')
-        self.size = (35, 35)
+        self.size = (50, 50)
         self.in_air = False
         self.state = self.STATE_ON_START
         self.points = 3
@@ -79,7 +88,13 @@ class Plane(Movable, Image, Collidable):
         self.unbind(on_update=self._return_to_scene)
         self.unbind(fixed_velocity=self._check_takeoff_point)
         self.unbind(fixed_velocity=self._update_lift)
+        self.unbind(on_collide=self._process_collissions)
         self.size = (0, 0)
+
+    def _process_collissions(self, instance, collide_object):
+        if (collide_object in Collector.get_collection('environment') and
+            collide_object in Collector.get_collection('solid')):
+            self.destroy()
 
     def _apply_arteficial_velocity(self, *args):
         self.move_manual(*self._get_fixed_velocity_vector())
@@ -139,6 +154,7 @@ class Plane(Movable, Image, Collidable):
             self.delete_from_collections(['planes'])
             self.lift.gravity = Vector(0, 0)
             self.move_stop()
+            self.fixed_velocity = 0
             self.pos = (self.center_x - 32, self.center_y - 32)
             self.size = (64, 64)
             self.source = 'bang.gif'

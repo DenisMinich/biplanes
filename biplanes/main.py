@@ -3,6 +3,8 @@ from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.resources import resource_add_path
+from kivy.uix.image import Image
+from kivy.graphics import Rectangle
 from parabox.base_object import BaseObject
 from parabox.phisics import PlainPhisics
 from parabox.structures import Collector
@@ -15,6 +17,7 @@ from biplanes.controllers import FireButton
 from biplanes.controllers import Info
 from biplanes.controllers import UpButton
 from biplanes.entities import Plane
+from biplanes.entities.ground import Ground
 from biplanes.settings import GLOBAL_GRAVITY
 from biplanes.settings import STATIC_PATH
 
@@ -28,12 +31,17 @@ class Battlefield(BaseObject):
         super(Battlefield, self).__init__(*args, **kwargs)
         self.blue_plane = Plane(
             id="Blue plane",
-            start_pos=(40, 200),
-            source='blue_plane.png')
-        self.red_plane = Plane(
+            start_pos=(40, 41),
+            source='blue_plane.png',
+            team='blue_team')
+        Plane(
             id="Red plane",
-            start_pos=(340, 200),
-            source='red_plane.png')
+            start_pos=(710, 41),
+            source='red_plane.png',
+            team='red_team')
+        Ground(
+            pos=(0, 0),
+            size=(800, 40))
         self.add_widget(UpButton(self.blue_plane))
         self.add_widget(DownButton(self.blue_plane))
         self.add_widget(ClockWiseButton(self.blue_plane))
@@ -52,6 +60,9 @@ class GameApp(App):
             parent_widget=battlefield)
         battlefield.objects = ObjectsCollection(
             Collector.get_collection('game_objects'),
+            parent_widget=battlefield)
+        battlefield.environment = ObjectsCollection(
+            Collector.get_collection('environment'),
             parent_widget=battlefield)
         shadow = BaseObject()
         shadow.objects = ObjectsCollection(

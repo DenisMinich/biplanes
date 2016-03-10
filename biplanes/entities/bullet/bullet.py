@@ -20,6 +20,9 @@ class Bullet(Movable, Image, Collidable):
         self.bind(on_update=self._delete_on_out_from_scene)
         self.bind(on_collide=self._process_collissions)
 
+    def get_damage(self, object_to_damage):
+        return 1
+
     def _get_start_velocity(self):
         direction = Vector(1, 0).rotate(self.owner.angle).normalize()
         return direction * settings.BULLET_SPEED
@@ -41,6 +44,10 @@ class Bullet(Movable, Image, Collidable):
             self.delete_from_collections()
 
     def _process_collissions(self, instance, collide_object):
-        if collide_object in Collector.get_collection('planes'):
-            collide_object.damage(1)
+        if (collide_object in Collector.get_collection('planes') and
+                self.owner.team != collide_object.team):
+            collide_object.damage(self.get_damage(collide_object))
+            self.delete_from_collections()
+        if (collide_object in Collector.get_collection('environment') and
+                collide_object in Collector.get_collection('solid')):
             self.delete_from_collections()
