@@ -2,9 +2,9 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.logger import Logger
+from kivy.properties import ObjectProperty
 from kivy.resources import resource_add_path
 from kivy.uix.image import Image
-from kivy.graphics import Rectangle
 from parabox.base_object import BaseObject
 from parabox.phisics import PlainPhisics
 from parabox.structures import Collector
@@ -27,7 +27,11 @@ Builder.load_file('game.kv')
 
 
 class Battlefield(BaseObject):
+
+    texuture = ObjectProperty()
+
     def __init__(self, *args, **kwargs):
+        self.texture = Image(source='background.png').texture
         super(Battlefield, self).__init__(*args, **kwargs)
         self.blue_plane = Plane(
             id="Blue plane",
