@@ -17,6 +17,7 @@ from biplanes.controllers import FireButton
 from biplanes.controllers import Info
 from biplanes.controllers import UpButton
 from biplanes.entities import Plane
+from biplanes.entities.blue_plane.blue_plane import BluePlane
 from biplanes.entities.ground import Ground
 from biplanes.settings import GLOBAL_GRAVITY
 from biplanes.settings import STATIC_PATH
@@ -33,24 +34,14 @@ class Battlefield(BaseObject):
     def __init__(self, *args, **kwargs):
         self.texture = Image(source='background.png').texture
         super(Battlefield, self).__init__(*args, **kwargs)
-        self.blue_plane = Plane(
-            id="Blue plane",
-            start_pos=(40, 41),
-            source='blue_plane.png',
-            team='blue_team')
-        Plane(
-            id="Red plane",
-            start_pos=(710, 41),
-            source='red_plane.png',
-            team='red_team')
-        Ground(
-            pos=(0, 0),
-            size=(800, 40))
+        self.blue_plane = BluePlane(id="Blue plane", source='blue_plane.png')
+        Ground(pos=(0, 0), size=(800, 40))
         self.add_widget(UpButton(self.blue_plane))
         self.add_widget(DownButton(self.blue_plane))
         self.add_widget(ClockWiseButton(self.blue_plane))
         self.add_widget(ConterClockWiseButton(self.blue_plane))
         self.add_widget(FireButton(self.blue_plane))
+        self.blue_plane.texture = Image(source='data/blue_plane.png').texture
 
 
 class GameApp(App):

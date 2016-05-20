@@ -1,39 +1,43 @@
-from functools import partial
+import os
 
-from kivy.logger import Logger
+from kivy.lang import Builder
 from kivy.properties import BooleanProperty
 from kivy.properties import BoundedNumericProperty
-from kivy.properties import NumericProperty
+from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.vector import Vector
-from kivy.uix.image import Image
 from parabox.behaviour import Collidable
 from parabox.behaviour import Movable
 from parabox.phisics import PlainPhisics
 from parabox.structures import Collector
 from parabox.structures import ObjectsCollection
 
-from biplanes import settings as global_settings
 from biplanes.entities.bullet.bullet import Bullet
+from biplanes.entities.plane.plane_states import PlaneStates
 from biplanes.entities.plane import settings as plane_settings
+from biplanes.entities.state_machine.state_machine import StateMachine
+from biplanes import settings as global_settings
 
 
-class Plane(Movable, Image, Collidable):
+class Plane(Movable, StateMachine, Collidable):
+    """Common entity for all planes"""
 
-    STATE_ON_START = 1
-    STATE_NORMAL = 2
-    STATE_DAMAGED = 3
-    STATE_CRITICAL_DAMAGED = 4
-    STATE_NO_PILOT = 5
-    STATE_BANG = 6
-
-    state = NumericProperty(STATE_ON_START)
     points = BoundedNumericProperty(3, max=3, min=0)
+    """Hit points of plane"""
+
     in_air = BooleanProperty(False)
+    """Flag, specified if plane if fly"""
+
+    team = StringProperty()
+    """String with team identifier"""
+
+    texture = ObjectProperty()
+    """Image representation of plane"""
+
     fixed_velocity = BoundedNumericProperty(
         0, min=0, max=plane_settings.MAX_SPEED_X,
         errorhandler=lambda x: 0 if x < 0 else plane_settings.MAX_SPEED_X)
-    team = StringProperty()
+    """Self velocity (engine analog)"""
 
     def __init__(self, *args, **kwargs):
         super(Plane, self).__init__(
@@ -43,11 +47,6 @@ class Plane(Movable, Image, Collidable):
             *args, **kwargs)
         self.lift = PlainPhisics(affect_objects=[self])
         self.inner_phisics = ObjectsCollection([self.lift], self)
-        self.anim_delay = -.1
-        self.anim_loop = 1
-        self.allow_stretch = True
-        self.start = partial(self._initialize, *args, **kwargs)
-        self.start()
 
     def increase_velocity(self, *args):
         self.fixed_velocity += .03
@@ -64,36 +63,9 @@ class Plane(Movable, Image, Collidable):
     def destroy(self):
         self.points = 0
 
-    def _initialize(self, *args, **kwargs):
-        self.team = kwargs.get('team')
-        self.delete_from_collections(['hidden_objects'])
-        self.add_to_collections(['planes', 'game_objects', self.team])
-        self.bind(on_update=self._apply_arteficial_velocity)
-        self.bind(on_update=self._return_to_scene)
-        self.bind(fixed_velocity=self._check_takeoff_point)
-        self.bind(fixed_velocity=self._update_lift)
-        self.bind(on_collide=self._process_collissions)
-        self.lift.gravity = Vector(0, global_settings.GLOBAL_GRAVITY)
-        self.pos = kwargs.get('start_pos')
-        self.size = (50, 50)
-        self.in_air = False
-        self.state = self.STATE_ON_START
-        self.points = 3
-        self.fixed_velocity = 0
-
-    def hide(self):
-        self.delete_from_collections(['game_objects'])
-        self.add_to_collections(['hidden_objects'])
-        self.unbind(on_update=self._apply_arteficial_velocity)
-        self.unbind(on_update=self._return_to_scene)
-        self.unbind(fixed_velocity=self._check_takeoff_point)
-        self.unbind(fixed_velocity=self._update_lift)
-        self.unbind(on_collide=self._process_collissions)
-        self.size = (0, 0)
-
     def _process_collissions(self, instance, collide_object):
         if (collide_object in Collector.get_collection('environment') and
-            collide_object in Collector.get_collection('solid')):
+                collide_object in Collector.get_collection('solid')):
             self.destroy()
 
     def _apply_arteficial_velocity(self, *args):
@@ -109,9 +81,11 @@ class Plane(Movable, Image, Collidable):
                 lift_value = global_settings.GLOBAL_GRAVITY
             else:
                 diff = plane_settings.TAKEOFF_POINT - self.fixed_velocity
-                lift_value = (
-                    0 if diff > plane_settings.POWER_DOWNGRADE_RANGE
-                    else (plane_settings.POWER_DOWNGRADE_RANGE - diff) * global_settings.GLOBAL_GRAVITY)
+                if diff > plane_settings.POWER_DOWNGRADE_RANGE:
+                    lift_value = 0
+                else:
+                    lift_value = ((plane_settings.POWER_DOWNGRADE_RANGE -
+                                   diff) * global_settings.GLOBAL_GRAVITY)
             self.lift.gravity = Vector(0, lift_value)
 
     def _return_to_scene(self, *args, **kwargs):
@@ -130,36 +104,13 @@ class Plane(Movable, Image, Collidable):
     @staticmethod
     def on_points(self, value):
         if value == 3:
-            self.state = self.STATE_NORMAL
+            self.change_state(PlaneStates.STATE_NORMAL)
         elif value == 2:
-            self.state = self.STATE_DAMAGED
+            self.change_state(PlaneStates.STATE_DAMAGED)
         elif value == 1:
-            self.state = self.STATE_CRITICAL_DAMAGED
+            self.change_state(PlaneStates.STATE_CRITICAL_DAMAGED)
         elif value == 0:
-            self.state = self.STATE_BANG
-
-    @staticmethod
-    def on_state(self, value):
-        if self.state == self.STATE_ON_START:
-            self.source = 'red_plane.png'
-        if self.state == self.STATE_NORMAL:
-            self.source = 'red_plane.png'
-        if self.state == self.STATE_DAMAGED:
-            self.source = 'red_plane.png'
-        if self.state == self.STATE_CRITICAL_DAMAGED:
-            self.source = 'red_plane.png'
-        if self.state == self.STATE_NO_PILOT:
-            self.source = 'red_plane.png'
-        if self.state == self.STATE_BANG:
-            self.delete_from_collections(['planes'])
-            self.lift.gravity = Vector(0, 0)
-            self.move_stop()
-            self.fixed_velocity = 0
-            self.pos = (self.center_x - 32, self.center_y - 32)
-            self.size = (64, 64)
-            self.source = 'bang.gif'
-            self.plan_action(30, self.hide)
-            self.plan_action(90, self.start)
+            self.change_state(PlaneStates.STATE_BANG)
 
     def __repr__(self):
         return "<Plane id='%s'>" % self.id

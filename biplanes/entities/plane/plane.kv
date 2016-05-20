@@ -1,10 +1,13 @@
-<Ground>:
+<Plane>:
     size: self.size
     pos: self.pos
+    anim_delay: -.1
+    anim_loop: 1
+    allow_stretch: True
     canvas.before:
         Color:
             rgb: (1, 1, 1)
         Rectangle:
-            size: 800, 50
+            size: self.size
             pos: self.pos
             texture: self.texture
