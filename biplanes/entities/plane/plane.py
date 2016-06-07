@@ -39,6 +39,20 @@ class Plane(Movable, StateMachine, Collidable):
         errorhandler=lambda x: 0 if x < 0 else plane_settings.MAX_SPEED_X)
     """Self velocity (engine analog)"""
 
+    _controller = None
+    """Controller of a plane"""
+
+    @property
+    def controller(self):
+        return self._controller
+
+    @controller.setter
+    def controller(self, value):
+        if self._controller is not None:
+            self._controller.unassign()
+        self._controller = value
+        self._controller.assign(self)
+
     def __init__(self, *args, **kwargs):
         super(Plane, self).__init__(
             resistance_y=.05,

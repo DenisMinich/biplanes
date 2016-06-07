@@ -10,12 +10,7 @@ from parabox.phisics import PlainPhisics
 from parabox.structures import Collector
 from parabox.structures import ObjectsCollection
 
-from biplanes.controllers import ClockWiseButton
-from biplanes.controllers import ConterClockWiseButton
-from biplanes.controllers import DownButton
-from biplanes.controllers import FireButton
-from biplanes.controllers import Info
-from biplanes.controllers import UpButton
+from biplanes.controllers.manual import ManualControl
 from biplanes.entities import Plane
 from biplanes.entities.blue_plane.blue_plane import BluePlane
 from biplanes.entities.ground import Ground
@@ -34,14 +29,12 @@ class Battlefield(BaseObject):
     def __init__(self, *args, **kwargs):
         self.texture = Image(source='background.png').texture
         super(Battlefield, self).__init__(*args, **kwargs)
-        self.blue_plane = BluePlane(id="Blue plane", source='blue_plane.png')
+        self.blue_plane = BluePlane(
+            id="Blue plane", source='blue_plane.png')
+        game_controller = ManualControl()
+        self.blue_plane.controller = game_controller
+        self.add_widget(game_controller)
         Ground(pos=(0, 0), size=(800, 40))
-        self.add_widget(UpButton(self.blue_plane))
-        self.add_widget(DownButton(self.blue_plane))
-        self.add_widget(ClockWiseButton(self.blue_plane))
-        self.add_widget(ConterClockWiseButton(self.blue_plane))
-        self.add_widget(FireButton(self.blue_plane))
-        self.blue_plane.texture = Image(source='data/blue_plane.png').texture
 
 
 class GameApp(App):
