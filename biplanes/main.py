@@ -1,20 +1,18 @@
+"""Main module of the app and contains main app class."""
+
 from kivy.app import App
-from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.logger import Logger
 from kivy.properties import ObjectProperty
 from kivy.resources import resource_add_path
-from kivy.uix.image import Image
 from parabox.base_object import BaseObject
-from parabox.phisics import PlainPhisics
-from parabox.structures import Collector
-from parabox.structures import ObjectsCollection
 
-from biplanes.controllers.manual import ManualControl
-from biplanes.entities import Plane
-from biplanes.entities.blue_plane.blue_plane import BluePlane
-from biplanes.entities.ground import Ground
-from biplanes.settings import GLOBAL_GRAVITY
+from biplanes.controls.builder import ControlBuilder
+from biplanes.controls.enums import Control
+from biplanes.planes.builder import PlaneBuilder
+from biplanes.planes.enums import PlaneModel
+from biplanes.planes.enums import Team
+from biplanes.scenes.builder import SceneBuilder
+from biplanes.scenes.enums import Scene
 from biplanes.settings import STATIC_PATH
 
 
@@ -22,43 +20,42 @@ resource_add_path(STATIC_PATH)
 Builder.load_file('game.kv')
 
 
-class Battlefield(BaseObject):
+class BiplanesClassicLevel(BaseObject):
+    """Classic biplanes level"""
 
-    texuture = ObjectProperty()
+    texture = ObjectProperty()
 
     def __init__(self, *args, **kwargs):
-        self.texture = Image(source='background.png').texture
-        super(Battlefield, self).__init__(*args, **kwargs)
-        self.blue_plane = BluePlane(
-            id="Blue plane", source='blue_plane.png')
-        game_controller = ManualControl()
-        self.blue_plane.controller = game_controller
-        self.add_widget(game_controller)
-        Ground(pos=(0, 0), size=(800, 40))
+        super(BiplanesClassicLevel, self).__init__(*args, **kwargs)
+        self._control_builder = ControlBuilder(self)
+        self._plane_builder = PlaneBuilder(self)
+        self._scene_builder = SceneBuilder(self)
+        self._draw_scene()
+        self._draw_planes()
+
+    def _draw_scene(self):
+        self._scene_builder.create_scene(
+            Scene.BIPLANES_CLASSIC)
+
+    def _draw_planes(self):
+        self._plane_builder.create_plane(
+            team=Team.BLUE_TEAM,
+            model=PlaneModel.STANDART,
+            control=self._control_builder.create_control(
+                Control.PLAYER_CONTROL))
+        self._plane_builder.create_plane(
+            team=Team.RED_TEAM,
+            model=PlaneModel.STANDART,
+            control=self._control_builder.create_control(
+                Control.AI_BEGINNER))
 
 
 class GameApp(App):
+    """Main class of the application."""
 
     def build(self):
-        battlefield = Battlefield()
-        battlefield.phisics = ObjectsCollection([
-            PlainPhisics(
-                gravity=(0, -GLOBAL_GRAVITY),
-                affect_objects=Collector.get_collection('planes'))],
-            parent_widget=battlefield)
-        battlefield.objects = ObjectsCollection(
-            Collector.get_collection('game_objects'),
-            parent_widget=battlefield)
-        battlefield.environment = ObjectsCollection(
-            Collector.get_collection('environment'),
-            parent_widget=battlefield)
-        shadow = BaseObject()
-        shadow.objects = ObjectsCollection(
-            Collector.get_collection('hidden_objects'),
-            parent_widget=shadow)
-        Clock.schedule_interval(battlefield.update, 1./60)
-        Clock.schedule_interval(shadow.update, 1./60)
-        return battlefield
+        """Should return main widget"""
+        return BiplanesClassicLevel()
 
 if __name__ == "__main__":
     GameApp().run()
