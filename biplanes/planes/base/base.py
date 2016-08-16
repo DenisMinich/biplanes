@@ -1,7 +1,6 @@
 """BasePlane implementation"""
 
 from kivy.properties import BooleanProperty
-from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
@@ -9,7 +8,6 @@ from kivy.vector import Vector
 from parabox.behaviour import Collidable
 from parabox.behaviour import Movable
 
-from biplanes.entities.bullet.bullet import Bullet
 from biplanes.entities.state_machine.state_machine import StateMachine
 
 
@@ -64,8 +62,8 @@ class BasePlane(Collidable, Movable, StateMachine):
     scene = ObjectProperty()
     """Scene object"""
 
-    states = ListProperty()
-    """Available states for the plane"""
+    gun = ObjectProperty()
+    """Gun object"""
 
     @property
     def control(self):
@@ -100,7 +98,10 @@ class BasePlane(Collidable, Movable, StateMachine):
 
     def fire(self):
         """Spawn bullet"""
-        return Bullet(owner=self)
+        return self.gun.fire(
+            pos=self.pos,
+            size=self.size,
+            angle=self.angle)
 
     def damage(self, amount):
         """Decrease points value by amount"""

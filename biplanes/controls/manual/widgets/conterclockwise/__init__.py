@@ -3,4 +3,4 @@ from kivy.lang import Builder
 
 
 Builder.load_file(
-    'biplanes/controllers/manual/widgets/conterclockwise/conterclockwise.kv')
+    'biplanes/controls/manual/widgets/conterclockwise/conterclockwise.kv')

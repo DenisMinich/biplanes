@@ -3,4 +3,4 @@
 from kivy.lang import Builder
 
 
-Builder.load_file('controllers/manual/widgets/clockwise/clockwise.kv')
+Builder.load_file('controls/manual/widgets/clockwise/clockwise.kv')

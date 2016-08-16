@@ -1,11 +1,6 @@
 """Contains planes exceptions"""
 
 
-class PlaneError(Exception):
-    """Base plane error"""
-    pass
-
-
-class PlaneBuilderError(PlaneError):
-    """Base plane builder error"""
+class PlaneFactoryError(Exception):
+    """Base plane factory error"""
     pass

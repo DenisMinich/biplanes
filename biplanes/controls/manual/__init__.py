@@ -3,4 +3,4 @@
 from kivy.lang import Builder
 
 
-Builder.load_file('biplanes/controllers/manual/manual.kv')
+Builder.load_file('biplanes/controls/manual/manual.kv')

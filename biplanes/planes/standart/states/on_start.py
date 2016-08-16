@@ -8,20 +8,13 @@ from biplanes.entities.plane.plane_states import PlaneStates
 class PlaneStateOnStart(object):
 
     source = Image(source='data/blue_plane.png')
+
     name = PlaneStates.STATE_ON_START
 
     @staticmethod
     def on_apply(owner):
         owner.texture = PlaneStateOnStart.source.texture
-        owner.delete_from_collections(['hidden_objects'])
-        owner.add_to_collections(['planes', 'game_objects'])
         PlaneStateOnStart._bind_actions(owner)
-        owner.lift.gravity = Vector(0, global_settings.GLOBAL_GRAVITY)
-        owner.size = (50, 50)
-        owner.pos = (20, 42)
-        owner.in_air = False
-        owner.points = 3
-        owner.fixed_velocity = 0
 
     @staticmethod
     def _bind_actions(owner):
