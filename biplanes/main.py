@@ -1,6 +1,10 @@
 """Main module of the app and contains main app class."""
 
+import os
+
 from kivy.app import App
+from kivy.lang import Builder
+from kivy.resources import resource_add_path
 from parabox.base_object import BaseObject
 
 from biplanes.controls.enums import Control
@@ -30,8 +34,8 @@ class BiplanesClassicLevel(BaseObject):
         self._scene_factory = SceneFactory()
         self._pilot_factory = PilotFactory()
         self._create_scene()
-        self._create_player_plane()
-        self._create_opponent_plane()
+        # self._create_player_plane()
+        # self._create_opponent_plane()
 
     def _create_scene(self):
         self._scene = self._scene_factory.get_scene(
@@ -122,8 +126,25 @@ class BiplanesClassicLevel(BaseObject):
 class GameApp(App):
     """Main class of the application."""
 
+    @staticmethod
+    def _load_markup_files():
+        project_directory = os.getcwd()
+        for root, _, files in os.walk(project_directory):
+            markup_files = [
+                os.path.join(root, file_name)
+                for file_name in files
+                if file_name.endswith('.kv')]
+            for file_name in markup_files:
+                Builder.load_file(file_name)
+
+    @staticmethod
+    def _add_resource_folders():
+        resource_add_path('biplanes/data')
+
     def build(self):
         """Should return main widget"""
+        self._load_markup_files()
+        self._add_resource_folders()
         return BiplanesClassicLevel().scene
 
 if __name__ == "__main__":

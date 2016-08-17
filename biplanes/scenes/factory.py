@@ -1,10 +1,10 @@
 """SceneFactory implementation"""
 
 from biplanes.scenes.classic.classic import BiplanesClassicScene
+from biplanes.scenes.decorations.explosion.explosion import Explosion
 from biplanes.scenes.enums import Decoration
 from biplanes.scenes.enums import Scene
 from biplanes.scenes.exceptions import SceneFactoryError
-from biplanes.scenes.decorations.explosion import Explosion
 
 
 class SceneFactory(object):  # pylint: disable=too-few-public-methods
