@@ -9,7 +9,7 @@ class PlaneFactory(object):  # pylint: disable=too-few-public-methods
     """Creates plane by its model's name"""
 
     @staticmethod
-    def get_plane(model):
+    def get_plane(model, *args, **kwargs):
         """Creates plane
 
         :param model: plane's model
@@ -18,6 +18,6 @@ class PlaneFactory(object):  # pylint: disable=too-few-public-methods
         :type control: biplanes.controls.base.base.BaseControl
         """
         if model == PlaneModel.STANDART:
-            return StandartPlane()
+            return StandartPlane(*args, **kwargs)
         else:
             raise PlaneFactoryError("Unknown plane's model name")

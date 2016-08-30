@@ -16,8 +16,3 @@ class BiplanesClassicScene(Widget):
         super(BiplanesClassicScene, self).__init__()
         self.texture = Image(source='background.png').texture
         self.add_widget(Ground(pos=(0, 0), size=(800, 40)))
-
-    def add_effect(self, effect):
-        """Add temporary visual effect"""
-        self.add_widget(effect)
-        effect.bind(on_finish=self.remove_widget)

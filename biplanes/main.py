@@ -3,9 +3,9 @@
 import os
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.resources import resource_add_path
-from parabox.base_object import BaseObject
 
 from biplanes.controls.enums import Control
 from biplanes.controls.factory import ControlFactory
@@ -17,44 +17,83 @@ from biplanes.scenes import enums as scenes_enums
 from biplanes.scenes.factory import SceneFactory
 
 
-class BiplanesClassicLevel(BaseObject):
+# pylint: disable=too-few-public-methods
+class BiplanesClassicLevel(object):
     """Classic biplanes level"""
 
     _scene = None
+
+    _update_interval = .01
+
+    _objects_to_update = None
+
+    _clock = None
 
     @property
     def scene(self):
         """Scene property"""
         return self._scene
 
-    def __init__(self, *args, **kwargs):
-        super(BiplanesClassicLevel, self).__init__(*args, **kwargs)
-        self._control_factory = ControlFactory()
-        self._plane_factory = PlaneFactory()
+    def __init__(self):
         self._scene_factory = SceneFactory()
+        self._plane_factory = PlaneFactory()
+        self._control_factory = ControlFactory()
         self._pilot_factory = PilotFactory()
+        self._objects_to_update = set()
         self._create_scene()
-        # self._create_player_plane()
+        self._create_player_plane()
         # self._create_opponent_plane()
+        self._start_level()
+
+    def _start_level(self):
+        """Setup update objects on schedule"""
+        self._clock = Clock.schedule_interval(
+            self._update_state, self._update_interval)
+
+    def _update_state(self, *_):
+        """Update inner objects"""
+        for inner_object in self._objects_to_update:
+            inner_object.update()
+
+    def _subscribe_to_update(self, target_object):
+        self._objects_to_update.add(target_object)
+
+    def _unsubscribe_from_update(self, target_object):
+        self._objects_to_update.remove(target_object)
 
     def _create_scene(self):
         self._scene = self._scene_factory.get_scene(
             scenes_enums.Scene.BIPLANES_CLASSIC)
 
+    def _add_time_effect(self, effect):
+        """Add temporary visual effect"""
+        self._scene.add_widget(effect)
+        effect.bind(on_finish=self._remove_effect)
+
+    def _remove_effect(self, effect):
+        """Remove effect from the scene"""
+        self._scene.remove_widget(effect)
+        self._unsubscribe_from_update(effect)
+
     def _create_player_plane(self):
-        blue_plane = PlaneFactory.get_plane(planes_enums.PlaneModel.STANDART)
+        blue_plane = self._plane_factory.get_plane(
+            planes_enums.PlaneModel.STANDART, scene=self.scene)
         blue_plane.team = planes_enums.Team.BLUE_TEAM
         blue_plane.control = self._control_factory.get_control(
             Control.PLAYER_CONTROL)
-        blue_plane.bind(on_destroy=self._process_player_plane_destroyed)
-        blue_plane.bind(on_ejection=self._process_player_plane_ejected)
+        # blue_plane.bind(on_destroy=self._process_player_plane_destroyed)
+        # blue_plane.bind(on_ejection=self._process_player_plane_ejected)
         self._scene.add_widget(blue_plane)
+        self._subscribe_to_update(blue_plane)
         self._scene.add_widget(blue_plane.control)
+        self._subscribe_to_update(blue_plane.control)
 
     def _process_player_plane_destroyed(self, plane, cause):
         self._scene.remove_widget(plane)
+        self._unsubscribe_from_update(plane)
         self._scene.remove_widget(plane.control)
-        self._scene.add_effect(self._scene_factory.get_decoration(
+        self._unsubscribe_from_update(plane.control)
+        self._add_time_effect(self._scene_factory.get_decoration(
             scenes_enums.Decoration.EXPLOSION))
         if plane.is_contains_pilot:
             self._process_player_death(plane.pilot, cause)
@@ -69,22 +108,29 @@ class BiplanesClassicLevel(BaseObject):
         pilot.bind(on_kill=self._process_player_pilot_killed)
         pilot.bind(on_achieve=self._process_player_achieved_spawn)
         self._scene.add_widget(pilot)
+        self._subscribe_to_update(pilot)
         self._scene.add_widget(pilot.control)
+        self._subscribe_to_update(pilot.control)
 
     def _process_player_pilot_killed(self, pilot, cause):
         self._scene.remove_widget(pilot)
+        self._unsubscribe_from_update(pilot)
         self._scene.remove_widget(pilot.control)
-        self._scene.add_effect(self._scene_factory.get_decoration(
+        self._unsubscribe_from_update(pilot.control)
+        self._add_time_effect(self._scene_factory.get_decoration(
             scenes_enums.Decoration.DEATH_ANIMATION))
         self._process_player_death(pilot.player, cause)
 
     def _process_player_achieved_spawn(self, pilot):
         self._scene.remove_widget(pilot)
+        self._unsubscribe_from_update(pilot)
         self._scene.remove_widget(pilot.control)
+        self._unsubscribe_from_update(pilot.control)
         self._create_player_plane()
 
     def _create_opponent_plane(self):
-        red_plane = PlaneFactory.get_plane(planes_enums.PlaneModel.STANDART)
+        red_plane = self._plane_factory.get_plane(
+            planes_enums.PlaneModel.STANDART, scene=self.scene)
         red_plane.team = planes_enums.Team.RED_TEAM
         red_plane.control = self._control_factory.get_control(
             Control.AI_BEGINNER)
@@ -94,7 +140,7 @@ class BiplanesClassicLevel(BaseObject):
 
     def _process_ai_plane_destroyed(self, plane, cause):
         self._scene.remove_widget(plane)
-        self._scene.add_effect(self._scene_factory.get_decoration(
+        self._add_time_effect(self._scene_factory.get_decoration(
             scenes_enums.Decoration.EXPLOSION))
         if plane.is_contains_pilot:
             self._process_player_death(plane.player, cause)
@@ -111,7 +157,7 @@ class BiplanesClassicLevel(BaseObject):
 
     def _process_ai_pilot_killed(self, pilot, cause):
         self._scene.remove_widget(pilot)
-        self._scene.add_effect(self._scene_factory.get_decoration(
+        self._add_time_effect(self._scene_factory.get_decoration(
             scenes_enums.Decoration.DEATH_ANIMATION))
         self._process_player_death(pilot.player, cause)
 
@@ -138,13 +184,13 @@ class GameApp(App):
                 Builder.load_file(file_name)
 
     @staticmethod
-    def _add_resource_folders():
+    def _add_resources_folders():
         resource_add_path('biplanes/data')
 
     def build(self):
         """Should return main widget"""
         self._load_markup_files()
-        self._add_resource_folders()
+        self._add_resources_folders()
         return BiplanesClassicLevel().scene
 
 if __name__ == "__main__":

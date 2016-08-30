@@ -1,10 +1,13 @@
 """Base class for controller button"""
 
+from kivy.properties import BooleanProperty
 from kivy.uix.widget import Widget
 
 
 class BaseButton(Widget):
     """Base controller class"""
+
+    touched = BooleanProperty(False)
 
     _target = None
 
@@ -32,11 +35,11 @@ class BaseButton(Widget):
 
     def _touch_down(self):
         """Perform actions on touch down"""
-        pass
+        self.touched = True
 
     def _touch_up(self):
         """Perform actions on touch up"""
-        pass
+        self.touched = False
 
     def on_touch_down(self, touch):
         if self._target is not None:
@@ -46,3 +49,7 @@ class BaseButton(Widget):
     def on_touch_up(self, touch):
         if self._target is not None:
             self._touch_up()
+
+    def update(self):
+        """Button action to override"""
+        pass

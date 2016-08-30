@@ -40,3 +40,8 @@ class ManualControl(BaseControl):  # pylint: disable=too-many-ancestors
         """Unassign all inner controls from target plane"""
         for control in self._controls:
             control.unassign()
+
+    def update(self):
+        """Update all inner controls state"""
+        for control in self._controls:
+            control.update()

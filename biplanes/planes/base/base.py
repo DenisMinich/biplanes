@@ -6,13 +6,10 @@ from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.vector import Vector
 from parabox.behaviour import Collidable
-from parabox.behaviour import Movable
-
-from biplanes.entities.state_machine.state_machine import StateMachine
 
 
 # pylint: disable=too-many-ancestors
-class BasePlane(Collidable, Movable, StateMachine):
+class BasePlane(Collidable):
     """Common entity for all planes"""
 
     takeoff_point = NumericProperty()
@@ -30,10 +27,10 @@ class BasePlane(Collidable, Movable, StateMachine):
     points = NumericProperty()
     """Hit points of plane"""
 
-    in_air = BooleanProperty()
+    is_in_air = BooleanProperty()
     """Flag, specified if plane in fly"""
 
-    in_move = BooleanProperty()
+    is_in_move = BooleanProperty()
     """Flag, specified if plane has started movement"""
 
     texture = ObjectProperty()
@@ -80,19 +77,22 @@ class BasePlane(Collidable, Movable, StateMachine):
     _control = ObjectProperty()
     """Control of a plane"""
 
-    def increase_velocity(self, *_):
+    def increase_velocity(self):
         """Increase plane's velocity by acceleration value"""
-        self.velocity += self.acceleration
+        if self.velocity != self.max_velocity:
+            self.velocity += self.acceleration
+            if self.velocity > self.max_velocity:
+                self.velocity = self.max_velocity
 
-    def decrease_velocity(self, *_):
+    def decrease_velocity(self):
         """Decrease plane's velocity by braking value"""
         self.velocity -= self.braking
 
-    def rotate_clockwise(self, *_):
+    def rotate_clockwise(self):
         """Rotate planes direction clockwise"""
         self.angle -= self.rotate_clockwise_velocity
 
-    def rotate_conterclockwise(self, *_):
+    def rotate_conterclockwise(self):
         """Rotate planes direction conterclockwise"""
         self.angle += self.rotate_conterclockwise_velocity
 
@@ -111,19 +111,22 @@ class BasePlane(Collidable, Movable, StateMachine):
         """Decrease health points to zero"""
         self.points = 0
 
-    def _process_collissions(self, *_):
-        for scene_objects in self.scene.environment:
-            if scene_objects.is_solid:
-                self.destroy()
+    def update(self):
+        self._check_is_in_move()
+        self._check_is_in_air()
+        self._move()
 
-    def _check_takeoff_point(self, *_):
-        if self.velocity > self.takeoff_point:
-            self.in_air = True
+    def _move(self):
+        self.pos = (
+            self.pos[0] + self.velocity_vector[0],
+            self.pos[1] + self.velocity_vector[1])
 
-    def _return_to_scene(self, *_):
-        plane_length = self.size[0]
-        scene_length = self.scene.size[0]
-        if self.center_x > scene_length:
-            self.pos[0] = -plane_length / 2
-        if self.center_x < 0:
-            self.pos[0] = scene_length - plane_length / 2
+    def _check_is_in_move(self):
+        if not self.is_in_move:
+            if self.velocity:
+                self.is_in_move = True
+
+    def _check_is_in_air(self):
+        if not self.is_in_air:
+            if self.velocity > self.takeoff_point:
+                self.is_in_air = True
