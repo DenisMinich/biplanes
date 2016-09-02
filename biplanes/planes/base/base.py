@@ -5,11 +5,14 @@ from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.vector import Vector
-from parabox.behaviour import Collidable
+
+from biplanes.base_entity import BaseEntity
+from biplanes.pilots import enums as pilots_enums
+from biplanes.pilots.factory import PilotFactory
 
 
-# pylint: disable=too-many-ancestors
-class BasePlane(Collidable):
+# pylint: disable=too-many-instance-attributes
+class BasePlane(BaseEntity):
     """Common entity for all planes"""
 
     takeoff_point = NumericProperty()
@@ -62,6 +65,18 @@ class BasePlane(Collidable):
     gun = ObjectProperty()
     """Gun object"""
 
+    angle = NumericProperty(0)
+    """Rotation angle"""
+
+    is_contains_pilot = BooleanProperty(True)
+    """Is pilot inside of the plane"""
+
+    DEATH_DAMAGED = 'damaged'
+    """Death cause for plane got too much damage"""
+
+    DEATH_CRASH = 'crash'
+    """Death cause for plane crashed with decoration"""
+
     @property
     def control(self):
         """Property for control"""
@@ -76,6 +91,10 @@ class BasePlane(Collidable):
 
     _control = ObjectProperty()
     """Control of a plane"""
+
+    def __init__(self, *args, **kwargs):
+        super(BasePlane, self).__init__(*args, **kwargs)
+        self.register_event_type('on_destroy')
 
     def increase_velocity(self):
         """Increase plane's velocity by acceleration value"""
@@ -98,20 +117,37 @@ class BasePlane(Collidable):
 
     def fire(self):
         """Spawn bullet"""
-        return self.gun.fire(
-            pos=self.pos,
-            size=self.size,
-            angle=self.angle)
+        return self.gun.fire()
 
     def damage(self, amount):
         """Decrease points value by amount"""
         self.points = 0 if amount >= self.points else self.points - amount
+        if not self.points:
+            self.destroy(self.DEATH_DAMAGED)
 
-    def destroy(self):
+    def destroy(self, cause):
         """Decrease health points to zero"""
-        self.points = 0
+        self.dispatch('on_destroy', cause)
+        self.remove_item(self)
+
+    def on_destroy(self, cause):
+        """Method should be called if plane was destroyed"""
+        pass
+
+    def eject(self):
+        """Catapult pilot"""
+        if self.is_contains_pilot:
+            pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
+            self.create_item(pilot)
+            self.dispatch('on_ejection', pilot)
+        self.is_contains_pilot = False
+
+    def on_ejection(self, pilot):
+        """Method should be called if pilot was ejected"""
+        pass
 
     def update(self):
+        """Update state of the plane"""
         self._check_is_in_move()
         self._check_is_in_air()
         self._move()

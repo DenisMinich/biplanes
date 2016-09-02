@@ -4,11 +4,11 @@ from kivy.properties import ObjectProperty
 from kivy.resources import resource_find
 from kivy.uix.image import Image
 
+from biplanes.guns.enums import GunModel
+from biplanes.guns.factory import GunFactory
 from biplanes.planes.base.base import BasePlane
 
 
-# pylint: disable=duplicate-bases
-# pylint: disable=too-many-ancestors
 # pylint: disable=too-many-instance-attributes
 class StandartPlane(BasePlane):
     """Standart biplane"""
@@ -46,11 +46,8 @@ class StandartPlane(BasePlane):
         self.rotate_conterclockwise_velocity = 3
         self.size = (50, 50)
         self.pos = (20, 42)
-
-    def _process_collissions(self, *_):
-        for scene_objects in self.scene.environment:
-            if scene_objects.is_solid:
-                self.destroy()
+        self.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=self)
+        self.create_item(self.gun)
 
     def _return_to_scene(self):
         plane_length = self.size[0]
@@ -74,5 +71,3 @@ class StandartPlane(BasePlane):
             self.texture = self._texture_damaged
         elif value == 1:
             self.texture = self._texture_critical_damaged
-        elif value == 0:
-            self.destroy()
