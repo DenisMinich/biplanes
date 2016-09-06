@@ -7,8 +7,6 @@ from kivy.properties import StringProperty
 from kivy.vector import Vector
 
 from biplanes.base_entity import BaseEntity
-from biplanes.pilots import enums as pilots_enums
-from biplanes.pilots.factory import PilotFactory
 
 
 # pylint: disable=too-many-instance-attributes
@@ -132,18 +130,6 @@ class BasePlane(BaseEntity):
 
     def on_destroy(self, cause):
         """Method should be called if plane was destroyed"""
-        pass
-
-    def eject(self):
-        """Catapult pilot"""
-        if self.is_contains_pilot:
-            pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
-            self.create_item(pilot)
-            self.dispatch('on_ejection', pilot)
-        self.is_contains_pilot = False
-
-    def on_ejection(self, pilot):
-        """Method should be called if pilot was ejected"""
         pass
 
     def update(self):

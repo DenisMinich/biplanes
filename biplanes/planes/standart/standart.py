@@ -4,8 +4,8 @@ from kivy.properties import ObjectProperty
 from kivy.resources import resource_find
 from kivy.uix.image import Image
 
-from biplanes.guns.enums import GunModel
-from biplanes.guns.factory import GunFactory
+from biplanes.pilots import enums as pilots_enums
+from biplanes.pilots.factory import PilotFactory
 from biplanes.planes.base.base import BasePlane
 
 
@@ -21,11 +21,11 @@ class StandartPlane(BasePlane):
 
     _texture_critical_damaged = ObjectProperty()
 
-    _scene = ObjectProperty()
+    scene = ObjectProperty()
 
     def __init__(self, scene):
         super(StandartPlane, self).__init__()
-        self._scene = scene
+        self.scene = scene
         self._texture_on_start = Image(
             source=resource_find('blue_plane.png')).texture
         self._texture_normal = Image(
@@ -46,20 +46,23 @@ class StandartPlane(BasePlane):
         self.rotate_conterclockwise_velocity = 3
         self.size = (50, 50)
         self.pos = (20, 42)
-        self.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=self)
-        self.create_item(self.gun)
-
-    def _return_to_scene(self):
-        plane_length = self.size[0]
-        scene_length = self._scene.size[0]
-        if self.center_x > scene_length:
-            self.pos[0] = -plane_length / 2
-        if self.center_x < 0:
-            self.pos[0] = scene_length - plane_length / 2
+        self.register_event_type('on_ejection')
 
     def update(self):
         super(StandartPlane, self).update()
         self._return_to_scene()
+
+    def eject(self):
+        """Catapult pilot"""
+        if self.is_contains_pilot:
+            pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
+            self.add_item(pilot)
+            self.dispatch('on_ejection', pilot)
+        self.is_contains_pilot = False
+
+    def on_ejection(self, pilot):
+        """Method should be called if pilot was ejected"""
+        pass
 
     def on_points(self, _, value):
         """Update planes state based on current points"""
@@ -71,3 +74,11 @@ class StandartPlane(BasePlane):
             self.texture = self._texture_damaged
         elif value == 1:
             self.texture = self._texture_critical_damaged
+
+    def _return_to_scene(self):
+        plane_length = self.size[0]
+        scene_length = self.scene.size[0]
+        if self.center_x > scene_length:
+            self.pos[0] = -plane_length / 2
+        if self.center_x < 0:
+            self.pos[0] = scene_length - plane_length / 2

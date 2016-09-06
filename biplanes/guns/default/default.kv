@@ -1,6 +1,14 @@
 <DefaultGun>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.plane.angle
+            axis: 0, 0, 1
+            origin: self.plane.center
     canvas:
         Rectangle:
-            size: self._plane.size
-            pos: self._plane.pos
-            texture: self._texture
+            size: self.plane.size
+            pos: self.plane.pos
+            texture: self.texture
+    canvas.after:
+        PopMatrix

@@ -9,6 +9,8 @@ from kivy.resources import resource_add_path
 
 from biplanes.controls.enums import Control
 from biplanes.controls.factory import ControlFactory
+from biplanes.guns.enums import GunModel
+from biplanes.guns.factory import GunFactory
 from biplanes.planes import enums as planes_enums
 from biplanes.planes.factory import PlaneFactory
 from biplanes.scenes import enums as scenes_enums
@@ -45,11 +47,11 @@ class BiplanesClassicLevel(object):
 
     def _update_state(self, *_):
         """Update inner objects"""
-        for inner_object in self._objects_to_update:
+        for inner_object in self._objects_to_update.copy():
             inner_object.update()
 
     def on_item_added(self, _, item):
-        """Callback on new item created"""
+        """Callback on new item added"""
         self.add_item(item)
 
     def on_item_removed(self, _, item):
@@ -60,15 +62,15 @@ class BiplanesClassicLevel(object):
         """Add item to the scene"""
         self._scene.add_widget(item)
         self._objects_to_update.add(item)
-        item.bind(on_create=self.on_item_added)
-        item.bind(on_remove=self.on_item_removed)
+        item.bind(on_add_item=self.on_item_added)
+        item.bind(on_remove_item=self.on_item_removed)
 
     def remove_item(self, item):
         """Remove item from the scene"""
         self._scene.remove_widget(item)
         self._objects_to_update.remove(item)
-        item.unbind(on_create=self.on_item_added)
-        item.unbind(on_remove=self.on_item_removed)
+        item.unbind(on_add_item=self.on_item_added)
+        item.unbind(on_remove_item=self.on_item_removed)
 
     def _create_scene(self):
         self._scene = SceneFactory.get_scene(
@@ -78,12 +80,14 @@ class BiplanesClassicLevel(object):
         blue_plane = PlaneFactory.get_plane(
             planes_enums.PlaneModel.STANDART, scene=self.scene)
         blue_plane.team = planes_enums.Team.BLUE_TEAM
-        blue_plane.control = ControlFactory.get_control(
-            Control.PLAYER_CONTROL)
         blue_plane.bind(on_destroy=self._process_player_plane_destroyed)
         blue_plane.bind(on_ejection=self._process_player_plane_ejected)
+        blue_plane.control = ControlFactory.get_control(
+            Control.PLAYER_CONTROL)
+        blue_plane.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=blue_plane)
         self.add_item(blue_plane)
         self.add_item(blue_plane.control)
+        self.add_item(blue_plane.gun)
 
     def _process_player_plane_destroyed(self, plane, cause):
         self.remove_item(plane)
