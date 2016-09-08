@@ -5,6 +5,7 @@ import os
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy import properties
 from kivy.resources import resource_add_path
 
 from biplanes.controls.enums import Control
@@ -13,6 +14,7 @@ from biplanes.guns.enums import GunModel
 from biplanes.guns.factory import GunFactory
 from biplanes.planes import enums as planes_enums
 from biplanes.planes.factory import PlaneFactory
+from biplanes.scenes.decorations.ground.ground import Ground
 from biplanes.scenes import enums as scenes_enums
 from biplanes.scenes.factory import SceneFactory
 
@@ -29,6 +31,14 @@ class BiplanesClassicLevel(object):
 
     _clock = None
 
+    team_blue = "blue team"
+
+    blue_team_score = 0
+
+    team_red = "red team"
+
+    red_team_score = 0
+
     @property
     def scene(self):
         """Scene property"""
@@ -43,12 +53,25 @@ class BiplanesClassicLevel(object):
     def _start_level(self):
         """Setup update objects on schedule"""
         self._clock = Clock.schedule_interval(
-            self._update_state, self._update_interval)
+            self._update_level, self._update_interval)
 
-    def _update_state(self, *_):
+    def _update_level(self, *_):
+        self._update_inner_objects()
+        self._process_collissions()
+
+    def _update_inner_objects(self):
         """Update inner objects"""
         for inner_object in self._objects_to_update.copy():
             inner_object.update()
+
+    def _process_collissions(self):
+        """Search for items' collissions and process them"""
+        level_objects = list(self._objects_to_update)
+        for index, inner_object in enumerate(level_objects):
+            for another_object in level_objects[index:]:
+                if inner_object.collide_widget(another_object):
+                    inner_object.process_collission(another_object)
+                    another_object.process_collission(inner_object)
 
     def on_item_added(self, _, item):
         """Callback on new item added"""
@@ -75,6 +98,7 @@ class BiplanesClassicLevel(object):
     def _create_scene(self):
         self._scene = SceneFactory.get_scene(
             scenes_enums.Scene.BIPLANES_CLASSIC)
+        self.add_item(Ground(scene=self._scene))
 
     def _create_player_plane(self):
         blue_plane = PlaneFactory.get_plane(
@@ -90,13 +114,16 @@ class BiplanesClassicLevel(object):
         self.add_item(blue_plane.gun)
 
     def _process_player_plane_destroyed(self, plane, cause):
-        self.remove_item(plane)
-        self.remove_item(plane.controller)
+        self.remove_item(plane.control)
+        self.remove_item(plane.gun)
         if plane.is_contains_pilot:
-            self._process_player_death(plane.pilot, cause)
+            if cause == plane.DEATH_DAMAGED:
+                self.red_team_score += 1
+            elif cause == plane.DEATH_CRASH:
+                self.blue_team_score -= 1
 
     def _process_player_plane_ejected(self, plane, pilot):
-        self.remove_item(plane.controller)
+        self.remove_item(plane.control)
         plane.control = ControlFactory.get_control(Control.AUTOPILOT)
         pilot.control = ControlFactory.get_control(
             Control.PLAYER_PILOT_CONTROL)

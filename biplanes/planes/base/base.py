@@ -28,7 +28,7 @@ class BasePlane(BaseEntity):
     points = NumericProperty()
     """Hit points of plane"""
 
-    is_in_air = BooleanProperty()
+    is_in_air = BooleanProperty(False)
     """Flag, specified if plane in fly"""
 
     is_in_move = BooleanProperty()

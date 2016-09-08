@@ -1,19 +1,21 @@
+"""Ground implementation"""
+
 from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
-from parabox.behaviour import Collidable
+
+from biplanes.base_entity import BaseEntity
 
 
-class Ground(Collidable):
+class Ground(BaseEntity):
+    """Ground layer on the bottom of the scene"""
 
     texture = ObjectProperty()
 
-    def __init__(self, *args, **kwargs):
+    scene = ObjectProperty()
+
+    def __init__(self, *args, scene=None, **kwargs):
+        self.scene = scene
         super(Ground, self).__init__(*args, **kwargs)
-        self.add_to_collections(['environment'])
-        self.add_to_collections(['solid'])
         self.texture = Image(source='ground.png').texture
         self.texture.wrap = 'repeat'
         self.texture.uvsize = (8, 1)
-
-    def __repr__(self):
-        return "<Ground id='%s'>" % self.id

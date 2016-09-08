@@ -42,3 +42,7 @@ class BaseEntity(Widget):
     def on_delete(self):
         """Method called if entity should be removed"""
         pass
+
+    def process_collission(self, item):
+        """Process collision of entity with item"""
+        pass

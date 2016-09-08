@@ -1,9 +1,9 @@
 """BaseControl implementation"""
 
-from parabox.base_object import BaseObject
+from biplanes.base_entity import BaseEntity
 
 
-class BaseControl(BaseObject):
+class BaseControl(BaseEntity):
     """Base implementation of control"""
 
     _target = None

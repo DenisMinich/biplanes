@@ -13,33 +13,31 @@ from biplanes.planes.base.base import BasePlane
 class StandartPlane(BasePlane):
     """Standart biplane"""
 
-    _texture_on_start = ObjectProperty()
+    texuture_on_start = ObjectProperty()
 
-    _texture_normal = ObjectProperty()
+    texuture_normal = ObjectProperty()
 
-    _texture_damaged = ObjectProperty()
+    texuture_damaged = ObjectProperty()
 
-    _texture_critical_damaged = ObjectProperty()
+    texuture_critical_damaged = ObjectProperty()
 
     scene = ObjectProperty()
 
     def __init__(self, scene):
         super(StandartPlane, self).__init__()
         self.scene = scene
-        self._texture_on_start = Image(
+        self.texuture_on_start = Image(
             source=resource_find('blue_plane.png')).texture
-        self._texture_normal = Image(
+        self.texuture_normal = Image(
             source=resource_find('blue_plane.png')).texture
-        self._texture_damaged = Image(
+        self.texuture_damaged = Image(
             source=resource_find('blue_plane.png')).texture
-        self._texture_critical_damaged = Image(
+        self.texuture_critical_damaged = Image(
             source=resource_find('blue_plane.png')).texture
         self.takeoff_point = 4
         self.max_velocity = 5
         self.max_points = 3
         self.points = 3
-        self.is_in_air = False
-        self.is_in_move = False
         self.acceleration = .03
         self.braking = .03
         self.rotate_clockwise_velocity = 3
@@ -67,13 +65,13 @@ class StandartPlane(BasePlane):
     def on_points(self, _, value):
         """Update planes state based on current points"""
         if value == 3 and self.is_in_air:
-            self.texture = self._texture_on_start
+            self.texture = self.texuture_on_start
         elif value == 3 and not self.is_in_air:
-            self.texture = self._texture_normal
+            self.texture = self.texuture_normal
         elif value == 2:
-            self.texture = self._texture_damaged
+            self.texture = self.texuture_damaged
         elif value == 1:
-            self.texture = self._texture_critical_damaged
+            self.texture = self.texuture_critical_damaged
 
     def _return_to_scene(self):
         plane_length = self.size[0]
@@ -82,3 +80,8 @@ class StandartPlane(BasePlane):
             self.pos[0] = -plane_length / 2
         if self.center_x < 0:
             self.pos[0] = scene_length - plane_length / 2
+
+    def process_collission(self, item):
+        from biplanes.scenes.decorations.ground.ground import Ground
+        if isinstance(item, Ground):
+            self.destroy(self.DEATH_CRASH)

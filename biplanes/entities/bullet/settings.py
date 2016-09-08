@@ -1,1 +1,0 @@
-BULLET_SPEED = 10

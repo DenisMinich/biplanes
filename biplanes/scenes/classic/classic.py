@@ -4,8 +4,6 @@ from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 
-from biplanes.entities.ground.ground import Ground
-
 
 class BiplanesClassicScene(Widget):
     """Base scene"""
@@ -15,4 +13,3 @@ class BiplanesClassicScene(Widget):
     def __init__(self):
         super(BiplanesClassicScene, self).__init__()
         self.texture = Image(source='background.png').texture
-        self.add_widget(Ground(pos=(0, 0), size=(800, 40)))

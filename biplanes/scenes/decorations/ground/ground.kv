@@ -1,10 +1,8 @@
 <Ground>:
-    size: self.size
+    size: (self.scene.width, 40)
     pos: self.pos
-    canvas.before:
-        Color:
-            rgb: (1, 1, 1)
+    canvas:
         Rectangle:
-            size: 800, 50
+            size: (self.scene.width, 50)
             pos: self.pos
             texture: self.texture
