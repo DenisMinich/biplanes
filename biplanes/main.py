@@ -5,7 +5,6 @@ import os
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy import properties
 from kivy.resources import resource_add_path
 
 from biplanes.controls.enums import Control
@@ -25,7 +24,7 @@ class BiplanesClassicLevel(object):
 
     _scene = None
 
-    _update_interval = .01
+    _update_interval = 1. / 40
 
     _objects_to_update = None
 

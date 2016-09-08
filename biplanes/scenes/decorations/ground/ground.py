@@ -1,5 +1,6 @@
 """Ground implementation"""
 
+from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
 
@@ -12,6 +13,8 @@ class Ground(BaseEntity):
     texture = ObjectProperty()
 
     scene = ObjectProperty()
+
+    tags = ListProperty(["decoration", "solid"])
 
     def __init__(self, *args, scene=None, **kwargs):
         self.scene = scene

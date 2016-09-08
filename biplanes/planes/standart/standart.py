@@ -10,6 +10,7 @@ from biplanes.planes.base.base import BasePlane
 
 
 # pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-ancestors
 class StandartPlane(BasePlane):
     """Standart biplane"""
 
@@ -82,6 +83,5 @@ class StandartPlane(BasePlane):
             self.pos[0] = scene_length - plane_length / 2
 
     def process_collission(self, item):
-        from biplanes.scenes.decorations.ground.ground import Ground
-        if isinstance(item, Ground):
+        if item.has_tags("decoration", "solid"):
             self.destroy(self.DEATH_CRASH)

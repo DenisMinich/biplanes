@@ -1,9 +1,9 @@
 """BaseEntity implementation"""
 
-from kivy.uix.widget import Widget
+from biplanes.tags.tagable import Tagable
 
 
-class BaseEntity(Widget):
+class BaseEntity(Tagable):
     """Base class for item on scene
 
     Main purpose: be sure that every object on level has 2 basic events:
