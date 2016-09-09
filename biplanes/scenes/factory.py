@@ -1,8 +1,6 @@
 """SceneFactory implementation"""
 
 from biplanes.scenes.classic.classic import BiplanesClassicScene
-from biplanes.scenes.decorations.explosion.explosion import Explosion
-from biplanes.scenes.enums import Decoration
 from biplanes.scenes.enums import Scene
 from biplanes.scenes.exceptions import SceneFactoryError
 
@@ -21,15 +19,3 @@ class SceneFactory(object):  # pylint: disable=too-few-public-methods
             return BiplanesClassicScene()
         else:
             raise SceneFactoryError("Unknown scene name")
-
-    @staticmethod
-    def get_decoration(decoration_name):
-        """Returns scene decoration widget by it's name
-
-        :param decoration_name: name of decoration to create
-        :type decoration_name: str
-        """
-        if decoration_name == Decoration.EXPLOSION:
-            return Explosion()
-        else:
-            raise SceneFactoryError("Unknown decoration name")

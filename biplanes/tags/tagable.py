@@ -22,10 +22,10 @@ class Tagable(Widget):
     @staticmethod
     def on_tags(instance, new_tags):
         """Update tags collection in case objects changed tags"""
-        for tag_to_remove in instance.old_tags - new_tags:
+        for tag_to_remove in set(instance.old_tags) - set(new_tags):
             Tag.remove_tag(instance, tag_to_remove)
 
-        for tag_to_add in new_tags - instance.old_tags:
+        for tag_to_add in set(new_tags) - set(instance.old_tags):
             Tag.add_tag(instance, tag_to_add)
 
     def has_tags(self, *tags):

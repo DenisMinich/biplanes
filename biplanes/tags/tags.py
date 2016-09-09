@@ -12,7 +12,8 @@ class Tag(object):
     @staticmethod
     def add_tag(instance, tag):
         """Assign object with tag"""
-        Tag.tags[tag].add(instance)
+        if instance not in Tag.tags[tag]:
+            Tag.tags[tag].add(instance)
 
     @staticmethod
     def remove_tag(instance, tag):

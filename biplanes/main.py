@@ -9,11 +9,12 @@ from kivy.resources import resource_add_path
 
 from biplanes.controls.enums import Control
 from biplanes.controls.factory import ControlFactory
+from biplanes.decors import enums as decors_enums
+from biplanes.decors.factory import DecorFactory
 from biplanes.guns.enums import GunModel
 from biplanes.guns.factory import GunFactory
 from biplanes.planes import enums as planes_enums
 from biplanes.planes.factory import PlaneFactory
-from biplanes.scenes.decorations.ground.ground import Ground
 from biplanes.scenes import enums as scenes_enums
 from biplanes.scenes.factory import SceneFactory
 
@@ -97,7 +98,8 @@ class BiplanesClassicLevel(object):
     def _create_scene(self):
         self._scene = SceneFactory.get_scene(
             scenes_enums.Scene.BIPLANES_CLASSIC)
-        self.add_item(Ground(scene=self._scene))
+        self.add_item(DecorFactory.get_decor(
+            decors_enums.DecorModel.GROUND, scene=self._scene))
 
     def _create_player_plane(self):
         blue_plane = PlaneFactory.get_plane(

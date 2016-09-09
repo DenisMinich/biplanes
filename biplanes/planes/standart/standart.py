@@ -4,6 +4,8 @@ from kivy.properties import ObjectProperty
 from kivy.resources import resource_find
 from kivy.uix.image import Image
 
+from biplanes.decors import enums as decors_enums
+from biplanes.decors.factory import DecorFactory
 from biplanes.pilots import enums as pilots_enums
 from biplanes.pilots.factory import PilotFactory
 from biplanes.planes.base.base import BasePlane
@@ -59,6 +61,12 @@ class StandartPlane(BasePlane):
             self.dispatch('on_ejection', pilot)
         self.is_contains_pilot = False
 
+    def destroy(self, cause):
+        explosion = DecorFactory.get_decor(
+            decors_enums.DecorModel.EXPLOSION, center=self.center)
+        self.add_item(explosion)
+        super(StandartPlane, self).destroy(cause)
+
     def on_ejection(self, pilot):
         """Method should be called if pilot was ejected"""
         pass
@@ -83,5 +91,5 @@ class StandartPlane(BasePlane):
             self.pos[0] = scene_length - plane_length / 2
 
     def process_collission(self, item):
-        if item.has_tags("decoration", "solid"):
+        if item.has_tags("solid"):
             self.destroy(self.DEATH_CRASH)

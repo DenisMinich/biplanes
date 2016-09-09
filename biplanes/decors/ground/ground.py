@@ -14,7 +14,7 @@ class Ground(BaseEntity):
 
     scene = ObjectProperty()
 
-    tags = ListProperty(["decoration", "solid"])
+    tags = ListProperty(["solid"])
 
     def __init__(self, *args, scene=None, **kwargs):
         self.scene = scene
