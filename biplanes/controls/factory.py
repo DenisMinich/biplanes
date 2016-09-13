@@ -1,5 +1,6 @@
 """ControlFactory implementation"""
 
+from biplanes.controls.ai_beginner.ai_beginner import AIBeginner
 from biplanes.controls.enums import Control
 from biplanes.controls.exceptions import ControlFactoryError
 from biplanes.controls.manual.manual import ManualControl
@@ -16,9 +17,8 @@ class ControlFactory(object):  # pylint: disable=too-few-public-methods
         :type scene_name: str
         """
         if control_name == Control.PLAYER_CONTROL:
-            manual_control = ManualControl()
-            return manual_control
+            return ManualControl()
         if control_name == Control.AI_BEGINNER:
-            raise NotImplementedError('Beginner AI not implemented')
+            return AIBeginner()
         else:
             raise ControlFactoryError("Unknown control name")

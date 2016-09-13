@@ -11,12 +11,15 @@ from biplanes.controls.enums import Control
 from biplanes.controls.factory import ControlFactory
 from biplanes.decors import enums as decors_enums
 from biplanes.decors.factory import DecorFactory
+from biplanes import enums as common_enums
 from biplanes.guns.enums import GunModel
 from biplanes.guns.factory import GunFactory
 from biplanes.planes import enums as planes_enums
 from biplanes.planes.factory import PlaneFactory
 from biplanes.scenes import enums as scenes_enums
 from biplanes.scenes.factory import SceneFactory
+from biplanes.textures import enums as textures_enums
+from biplanes.textures.factory import TextureFactory
 
 
 # pylint: disable=too-few-public-methods
@@ -48,6 +51,7 @@ class BiplanesClassicLevel(object):
         self._objects_to_update = set()
         self._create_scene()
         self._create_player_plane()
+        self._create_opponent_plane()
         self._start_level()
 
     def _start_level(self):
@@ -102,8 +106,11 @@ class BiplanesClassicLevel(object):
             decors_enums.DecorModel.GROUND, scene=self._scene))
 
     def _create_player_plane(self):
+        textures_pack = TextureFactory.get_textures_pack(
+            textures_enums.TexturePackModel.BLUE_PLANE)
         blue_plane = PlaneFactory.get_plane(
-            planes_enums.PlaneModel.STANDART, scene=self.scene)
+            planes_enums.PlaneModel.STANDART, scene=self.scene, pos=(20, 42),
+            textures=textures_pack, direction=common_enums.Direction.RIGHT)
         blue_plane.team = planes_enums.Team.BLUE_TEAM
         blue_plane.bind(on_destroy=self._process_player_plane_destroyed)
         blue_plane.bind(on_ejection=self._process_player_plane_ejected)
@@ -135,15 +142,26 @@ class BiplanesClassicLevel(object):
     def _process_player_pilot_killed(self, pilot, cause):
         self.remove_item(pilot)
         self.remove_item(pilot.control)
-        self._process_player_death(pilot.player, cause)
+        if cause:
+            pass
 
     def _process_player_achieved_spawn(self, pilot):
         self.remove_item(pilot)
         self.remove_item(pilot.control)
         self._create_player_plane()
 
-    def _process_player_death(self, player, cause):
-        pass
+    def _create_opponent_plane(self):
+        textures_pack = TextureFactory.get_textures_pack(
+            textures_enums.TexturePackModel.RED_PLANE)
+        red_plane = PlaneFactory.get_plane(
+            planes_enums.PlaneModel.STANDART, scene=self.scene, pos=(725, 42),
+            textures=textures_pack, direction=common_enums.Direction.LEFT)
+        red_plane.team = planes_enums.Team.RED_TEAM
+        red_plane.control = ControlFactory.get_control(Control.AI_BEGINNER)
+        red_plane.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=red_plane)
+        self.add_item(red_plane)
+        self.add_item(red_plane.control)
+        self.add_item(red_plane.gun)
 
 
 class GameApp(App):

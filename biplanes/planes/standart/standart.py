@@ -1,11 +1,10 @@
 """Standart biplane implementation"""
 
-from kivy.properties import ObjectProperty
-from kivy.resources import resource_find
-from kivy.uix.image import Image
+from kivy import properties
 
 from biplanes.decors import enums as decors_enums
 from biplanes.decors.factory import DecorFactory
+from biplanes import enums as common_enums
 from biplanes.pilots import enums as pilots_enums
 from biplanes.pilots.factory import PilotFactory
 from biplanes.planes.base.base import BasePlane
@@ -16,27 +15,25 @@ from biplanes.planes.base.base import BasePlane
 class StandartPlane(BasePlane):
     """Standart biplane"""
 
-    texuture_on_start = ObjectProperty()
+    texture_on_start = properties.ObjectProperty()
 
-    texuture_normal = ObjectProperty()
+    texture_normal = properties.ObjectProperty()
 
-    texuture_damaged = ObjectProperty()
+    texture_damaged = properties.ObjectProperty()
 
-    texuture_critical_damaged = ObjectProperty()
+    texture_critical_damaged = properties.ObjectProperty()
 
-    scene = ObjectProperty()
+    scene = properties.ObjectProperty()
 
-    def __init__(self, scene):
-        super(StandartPlane, self).__init__()
+    direction = properties.StringProperty(common_enums.Direction.RIGHT)
+
+    def __init__(
+            self, *args, scene=None, textures=None, direction=None, **kwargs):
+        super(StandartPlane, self).__init__(*args, **kwargs)
         self.scene = scene
-        self.texuture_on_start = Image(
-            source=resource_find('blue_plane.png')).texture
-        self.texuture_normal = Image(
-            source=resource_find('blue_plane.png')).texture
-        self.texuture_damaged = Image(
-            source=resource_find('blue_plane.png')).texture
-        self.texuture_critical_damaged = Image(
-            source=resource_find('blue_plane.png')).texture
+        self.direction = direction
+        self._apply_textures(textures)
+        self.angle = 0 if direction == common_enums.Direction.RIGHT else 180
         self.takeoff_point = 4
         self.max_velocity = 5
         self.max_points = 3
@@ -46,8 +43,21 @@ class StandartPlane(BasePlane):
         self.rotate_clockwise_velocity = 3
         self.rotate_conterclockwise_velocity = 3
         self.size = (50, 50)
-        self.pos = (20, 42)
         self.register_event_type('on_ejection')
+
+    def _apply_textures(self, textures):
+        """Assign textures for the plane"""
+        self.texture_on_start = textures.plane_on_start
+        self.texture_normal = textures.plane_normal
+        self.texture_damaged = textures.plane_damaged
+        self.texture_critical_damaged = textures.plane_critical_damaged
+        if self.direction == common_enums.Direction.LEFT:
+            # pylint: disable=no-member
+            self.texture_on_start.flip_vertical()
+            self.texture_normal.flip_vertical()
+            self.texture_damaged.flip_vertical()
+            self.texture_critical_damaged.flip_vertical()
+            # pylint: enable=no-member
 
     def update(self):
         super(StandartPlane, self).update()
@@ -74,13 +84,13 @@ class StandartPlane(BasePlane):
     def on_points(self, _, value):
         """Update planes state based on current points"""
         if value == 3 and self.is_in_air:
-            self.texture = self.texuture_on_start
+            self.texture = self.texture_on_start
         elif value == 3 and not self.is_in_air:
-            self.texture = self.texuture_normal
+            self.texture = self.texture_normal
         elif value == 2:
-            self.texture = self.texuture_damaged
+            self.texture = self.texture_damaged
         elif value == 1:
-            self.texture = self.texuture_critical_damaged
+            self.texture = self.texture_critical_damaged
 
     def _return_to_scene(self):
         plane_length = self.size[0]
