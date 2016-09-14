@@ -158,7 +158,9 @@ class BiplanesClassicLevel(object):
             textures=textures_pack, direction=common_enums.Direction.LEFT)
         red_plane.team = planes_enums.Team.RED_TEAM
         red_plane.control = ControlFactory.get_control(Control.AI_BEGINNER)
-        red_plane.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=red_plane)
+        red_plane.gun = GunFactory.get_gun(
+            GunModel.DEFAULT, plane=red_plane,
+            direction=common_enums.Direction.LEFT)
         self.add_item(red_plane)
         self.add_item(red_plane.control)
         self.add_item(red_plane.gun)

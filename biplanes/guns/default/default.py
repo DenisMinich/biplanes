@@ -2,6 +2,7 @@
 
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
 from kivy.resources import resource_find
 from kivy.uix.image import Image
 from kivy.vector import Vector
@@ -9,6 +10,7 @@ from kivy.vector import Vector
 from biplanes.base_entity import BaseEntity
 from biplanes.bullets.enums import BulletModel
 from biplanes.bullets.factory import BulletFactory
+from biplanes import enums as common_enums
 
 
 class DefaultGun(BaseEntity):
@@ -35,6 +37,9 @@ class DefaultGun(BaseEntity):
     ticks_to_prepare = NumericProperty(0)
     """How many ticks to wait until new shot"""
 
+    direction = StringProperty(common_enums.Direction.RIGHT)
+    """Direction of the gun"""
+
     @property
     def ready_to_shot(self):
         """Is gun ready for shot"""
@@ -43,7 +48,13 @@ class DefaultGun(BaseEntity):
     def __init__(self, plane=None, *args, **kwargs):
         self.plane = plane
         super(DefaultGun, self).__init__(*args, **kwargs)
-        self.texture = Image(source=resource_find('gun_default.png')).texture
+        texture = Image(
+            source=resource_find('gun_default.png'), nocache=True).texture
+        if self.direction == common_enums.Direction.LEFT:
+            # pylint: disable=no-member
+            texture.flip_vertical()
+            # pylint: enable=no-member
+        self.texture = texture
 
     def fire(self):
         """Creates bullet assigned for this gun"""
