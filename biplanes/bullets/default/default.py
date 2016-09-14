@@ -8,6 +8,7 @@ from kivy.vector import Vector
 from biplanes.base_entity import BaseEntity
 
 
+# pylint: disable=too-many-instance-attributes
 class DefaultBullet(BaseEntity):
     """Base plane bullet widget"""
 
@@ -24,6 +25,9 @@ class DefaultBullet(BaseEntity):
     velocity = NumericProperty()
     """Actual velocity"""
 
+    damage = NumericProperty()
+    """How many points bullet get from the plane"""
+
     @property
     def velocity_vector(self):
         """Vector of plane's velocity"""
@@ -34,6 +38,7 @@ class DefaultBullet(BaseEntity):
         self.texture = Image(source='bullet_default.png').texture
         self.size = (5, 5)
         self.velocity = 7
+        self.damage = 1
         self.scene = scene
         self.team = team
         self.angle = angle
@@ -52,4 +57,11 @@ class DefaultBullet(BaseEntity):
         in_scene = (0 < self.center_x < self.scene.size[0]) and \
             (0 < self.center_y < self.scene.size[1])
         if not in_scene:
+            self.remove_item(self)
+
+    def process_collission(self, item):
+        if item.has_tags("plane") and item.team != self.team:
+            item.damage(self.damage)
+            self.remove_item(self)
+        if item.has_tags("solid"):
             self.remove_item(self)

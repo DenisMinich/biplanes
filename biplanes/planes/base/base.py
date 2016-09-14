@@ -1,6 +1,7 @@
 """BasePlane implementation"""
 
 from kivy.properties import BooleanProperty
+from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
@@ -39,6 +40,8 @@ class BasePlane(BaseEntity):
 
     velocity = NumericProperty()
     """Actual velocity"""
+
+    tags = ListProperty(["plane"])
 
     @property
     def velocity_vector(self):
