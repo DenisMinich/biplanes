@@ -51,7 +51,7 @@ class BiplanesClassicLevel(object):
         self._objects_to_update = set()
         self._create_scene()
         self._create_player_plane()
-        self._create_opponent_plane()
+        self._create_ai_plane()
         self._start_level()
 
     def _start_level(self):
@@ -150,12 +150,13 @@ class BiplanesClassicLevel(object):
         self.remove_item(pilot.control)
         self._create_player_plane()
 
-    def _create_opponent_plane(self):
+    def _create_ai_plane(self):
         textures_pack = TextureFactory.get_textures_pack(
             textures_enums.TexturePackModel.RED_PLANE)
         red_plane = PlaneFactory.get_plane(
             planes_enums.PlaneModel.STANDART, scene=self.scene, pos=(725, 42),
             textures=textures_pack, direction=common_enums.Direction.LEFT)
+        red_plane.bind(on_destroy=self._process_ai_plane_destroyed)
         red_plane.team = planes_enums.Team.RED_TEAM
         red_plane.control = ControlFactory.get_control(Control.AI_BEGINNER)
         red_plane.gun = GunFactory.get_gun(
@@ -164,6 +165,15 @@ class BiplanesClassicLevel(object):
         self.add_item(red_plane)
         self.add_item(red_plane.control)
         self.add_item(red_plane.gun)
+
+    def _process_ai_plane_destroyed(self, plane, cause):
+        self.remove_item(plane.control)
+        self.remove_item(plane.gun)
+        if plane.is_contains_pilot:
+            if cause == plane.DEATH_DAMAGED:
+                self.blue_team_score += 1
+            elif cause == plane.DEATH_CRASH:
+                self.red_team_score -= 1
 
 
 class GameApp(App):
