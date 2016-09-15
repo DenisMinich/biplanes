@@ -34,6 +34,8 @@ class BiplanesClassicLevel(object):
 
     _clock = None
 
+    respawn_interval = 1
+
     team_blue = "blue team"
 
     blue_team_score = 0
@@ -105,7 +107,7 @@ class BiplanesClassicLevel(object):
         self.add_item(DecorFactory.get_decor(
             decors_enums.DecorModel.GROUND, scene=self._scene))
 
-    def _create_player_plane(self):
+    def _create_player_plane(self, *_):
         textures_pack = TextureFactory.get_textures_pack(
             textures_enums.TexturePackModel.BLUE_PLANE)
         blue_plane = PlaneFactory.get_plane(
@@ -129,6 +131,8 @@ class BiplanesClassicLevel(object):
                 self.red_team_score += 1
             elif cause == plane.DEATH_CRASH:
                 self.blue_team_score -= 1
+            Clock.schedule_once(
+                self._create_player_plane, self.respawn_interval)
 
     def _process_player_plane_ejected(self, plane, pilot):
         self.remove_item(plane.control)
@@ -150,7 +154,7 @@ class BiplanesClassicLevel(object):
         self.remove_item(pilot.control)
         self._create_player_plane()
 
-    def _create_ai_plane(self):
+    def _create_ai_plane(self, *_):
         textures_pack = TextureFactory.get_textures_pack(
             textures_enums.TexturePackModel.RED_PLANE)
         red_plane = PlaneFactory.get_plane(
@@ -174,6 +178,8 @@ class BiplanesClassicLevel(object):
                 self.blue_team_score += 1
             elif cause == plane.DEATH_CRASH:
                 self.red_team_score -= 1
+            Clock.schedule_once(
+                self._create_ai_plane, self.respawn_interval)
 
 
 class GameApp(App):
