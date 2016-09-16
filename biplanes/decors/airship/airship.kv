@@ -1,0 +1,12 @@
+<Airship>:
+    canvas.before:
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            texture: self.texture
+    Label:
+        font_size: 20
+        top: self.parent.top - (self.height - 20) / 2
+        center_x: self.parent.center_x
+        text: self.parent.score_text
+        markup: True

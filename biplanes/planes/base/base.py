@@ -4,7 +4,6 @@ from kivy.properties import BooleanProperty
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
-from kivy.properties import StringProperty
 from kivy.vector import Vector
 
 from biplanes.base_entity import BaseEntity
@@ -23,7 +22,7 @@ class BasePlane(BaseEntity):
     max_points = NumericProperty()
     """Maximal hit points of plane"""
 
-    team = StringProperty()
+    team = ObjectProperty()
     """String with team identifier"""
 
     points = NumericProperty()

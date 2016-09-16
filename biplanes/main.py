@@ -5,7 +5,9 @@ import os
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy import properties
 from kivy.resources import resource_add_path
+from kivy.uix.widget import Widget
 
 from biplanes.controls.enums import Control
 from biplanes.controls.factory import ControlFactory
@@ -23,7 +25,7 @@ from biplanes.textures.factory import TextureFactory
 
 
 # pylint: disable=too-few-public-methods
-class BiplanesClassicLevel(object):
+class BiplanesClassicLevel(Widget):
     """Classic biplanes level"""
 
     _scene = None
@@ -36,13 +38,11 @@ class BiplanesClassicLevel(object):
 
     respawn_interval = 1
 
-    team_blue = "blue team"
+    blue_team = common_enums.BlueTeam
 
-    blue_team_score = 0
+    red_team = common_enums.RedTeam
 
-    team_red = "red team"
-
-    red_team_score = 0
+    score = properties.DictProperty({blue_team: 0, red_team: 0})
 
     @property
     def scene(self):
@@ -50,6 +50,7 @@ class BiplanesClassicLevel(object):
         return self._scene
 
     def __init__(self):
+        super(BiplanesClassicLevel, self).__init__()
         self._objects_to_update = set()
         self._create_scene()
         self._create_player_plane()
@@ -106,6 +107,8 @@ class BiplanesClassicLevel(object):
             scenes_enums.Scene.BIPLANES_CLASSIC)
         self.add_item(DecorFactory.get_decor(
             decors_enums.DecorModel.GROUND, scene=self._scene))
+        self.add_item(DecorFactory.get_decor(
+            decors_enums.DecorModel.AIRSHIP, scene=self._scene, level=self))
 
     def _create_player_plane(self, *_):
         textures_pack = TextureFactory.get_textures_pack(
@@ -113,7 +116,7 @@ class BiplanesClassicLevel(object):
         blue_plane = PlaneFactory.get_plane(
             planes_enums.PlaneModel.STANDART, scene=self.scene, pos=(20, 42),
             textures=textures_pack, direction=common_enums.Direction.RIGHT)
-        blue_plane.team = planes_enums.Team.BLUE_TEAM
+        blue_plane.team = self.blue_team
         blue_plane.bind(on_destroy=self._process_player_plane_destroyed)
         blue_plane.bind(on_ejection=self._process_player_plane_ejected)
         blue_plane.control = ControlFactory.get_control(
@@ -128,9 +131,9 @@ class BiplanesClassicLevel(object):
         self.remove_item(plane.gun)
         if plane.is_contains_pilot:
             if cause == plane.DEATH_DAMAGED:
-                self.red_team_score += 1
+                self.score[self.red_team] += 1
             elif cause == plane.DEATH_CRASH:
-                self.blue_team_score -= 1
+                self.score[self.blue_team] -= 1
             Clock.schedule_once(
                 self._create_player_plane, self.respawn_interval)
 
@@ -161,7 +164,7 @@ class BiplanesClassicLevel(object):
             planes_enums.PlaneModel.STANDART, scene=self.scene, pos=(725, 42),
             textures=textures_pack, direction=common_enums.Direction.LEFT)
         red_plane.bind(on_destroy=self._process_ai_plane_destroyed)
-        red_plane.team = planes_enums.Team.RED_TEAM
+        red_plane.team = self.red_team
         red_plane.control = ControlFactory.get_control(Control.AI_BEGINNER)
         red_plane.gun = GunFactory.get_gun(
             GunModel.DEFAULT, plane=red_plane,
@@ -175,9 +178,9 @@ class BiplanesClassicLevel(object):
         self.remove_item(plane.gun)
         if plane.is_contains_pilot:
             if cause == plane.DEATH_DAMAGED:
-                self.blue_team_score += 1
+                self.score[self.blue_team] += 1
             elif cause == plane.DEATH_CRASH:
-                self.red_team_score -= 1
+                self.score[self.red_team] -= 1
             Clock.schedule_once(
                 self._create_ai_plane, self.respawn_interval)
 

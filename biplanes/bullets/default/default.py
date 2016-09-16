@@ -30,7 +30,7 @@ class DefaultBullet(BaseEntity):
 
     @property
     def velocity_vector(self):
-        """Vector of plane's velocity"""
+        """Vector of velocity"""
         return Vector(self.velocity, 0).rotate(self.angle)
 
     def __init__(self, *args, team=None, angle=None, scene=None, **kwargs):
