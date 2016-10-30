@@ -38,8 +38,8 @@ class StandartPlane(BasePlane):
         self.max_velocity = 5
         self.max_points = 3
         self.points = 3
-        self.acceleration = .03
-        self.braking = .03
+        self.acceleration = .15
+        self.braking = .15
         self.rotate_clockwise_velocity = 3
         self.rotate_conterclockwise_velocity = 3
         self.size = (50, 50)

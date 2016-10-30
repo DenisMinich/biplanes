@@ -1,6 +1,7 @@
 """DecorFactory implementation"""
 
 from biplanes.decors.airship.airship import Airship
+from biplanes.decors.barn import barn
 from biplanes.decors.enums import DecorModel
 from biplanes.decors.exceptions import DecorFactoryError
 from biplanes.decors.explosion.explosion import Explosion
@@ -23,5 +24,7 @@ class DecorFactory(object):  # pylint: disable=too-few-public-methods
             return Ground(*args, **kwargs)
         elif decor_name == DecorModel.AIRSHIP:
             return Airship(*args, **kwargs)
+        elif decor_name == DecorModel.BARN:
+            return barn.Barn(*args, **kwargs)
         else:
             raise DecorFactoryError("Unknown decor name")

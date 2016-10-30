@@ -24,7 +24,6 @@ from biplanes.textures import enums as textures_enums
 from biplanes.textures.factory import TextureFactory
 
 
-# pylint: disable=too-few-public-methods
 class BiplanesClassicLevel(Widget):
     """Classic biplanes level"""
 
@@ -109,6 +108,8 @@ class BiplanesClassicLevel(Widget):
             decors_enums.DecorModel.GROUND, scene=self._scene))
         self.add_item(DecorFactory.get_decor(
             decors_enums.DecorModel.AIRSHIP, scene=self._scene, level=self))
+        self.add_item(DecorFactory.get_decor(
+            decors_enums.DecorModel.BARN, pos=(325, 40), size=(150, 100)))
 
     def _create_player_plane(self, *_):
         textures_pack = TextureFactory.get_textures_pack(
