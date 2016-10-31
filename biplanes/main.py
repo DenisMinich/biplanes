@@ -104,12 +104,23 @@ class BiplanesClassicLevel(Widget):
     def _create_scene(self):
         self._scene = SceneFactory.get_scene(
             scenes_enums.Scene.BIPLANES_CLASSIC)
+        self._scene.size = (800, 600)
+        self.add_item(DecorFactory.get_decor(
+            decors_enums.DecorModel.BARN, pos=(325, 40), size=(150, 100)))
         self.add_item(DecorFactory.get_decor(
             decors_enums.DecorModel.GROUND, scene=self._scene))
         self.add_item(DecorFactory.get_decor(
             decors_enums.DecorModel.AIRSHIP, scene=self._scene, level=self))
         self.add_item(DecorFactory.get_decor(
-            decors_enums.DecorModel.BARN, pos=(325, 40), size=(150, 100)))
+            decors_enums.DecorModel.CLOUD, size=(250, 180), angle=-180,
+            flight_height_middle=self.scene.height * .7,
+            flight_height_dispersion=self.scene.height * .1,
+            left_border=-150, right_border=950))
+        self.add_item(DecorFactory.get_decor(
+            decors_enums.DecorModel.CLOUD, size=(250, 180), angle=-180,
+            flight_height_middle=self.scene.height * .7,
+            flight_height_dispersion=self.scene.height * .1,
+            left_border=-150, right_border=950))
 
     def _create_player_plane(self, *_):
         textures_pack = TextureFactory.get_textures_pack(

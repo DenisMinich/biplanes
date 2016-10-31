@@ -8,3 +8,4 @@ class DecorModel(object):  # pylint: disable=too-few-public-methods
     EXPLOSION = 'explosion'
     GROUND = 'ground'
     BARN = 'barn'
+    CLOUD = 'cloud'
