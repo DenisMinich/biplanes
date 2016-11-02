@@ -36,6 +36,7 @@ class StandartPlane(BasePlane):
         self.angle = 0 if direction == common_enums.Direction.RIGHT else 180
         self.takeoff_point = 4
         self.max_velocity = 5
+        self.ejection_velocity = 3
         self.max_points = 3
         self.points = 3
         self.acceleration = .15
@@ -67,6 +68,8 @@ class StandartPlane(BasePlane):
         """Catapult pilot"""
         if self.is_contains_pilot:
             pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
+            pilot.angle = self.angle + 90
+            pilot.velocity = self.ejection_velocity
             self.add_item(pilot)
             self.dispatch('on_ejection', pilot)
         self.is_contains_pilot = False

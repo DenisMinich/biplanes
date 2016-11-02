@@ -1,9 +1,11 @@
 """ControlFactory implementation"""
 
-from biplanes.controls.ai_beginner.ai_beginner import AIBeginner
+from biplanes.controls.ai_beginner import ai_beginner
+from biplanes.controls.autopilot import autopilot
 from biplanes.controls.enums import Control
 from biplanes.controls.exceptions import ControlFactoryError
-from biplanes.controls.manual.manual import ManualControl
+from biplanes.controls.manual import manual
+from biplanes.controls.manual_pilot import manual_pilot
 
 
 class ControlFactory(object):  # pylint: disable=too-few-public-methods
@@ -17,8 +19,12 @@ class ControlFactory(object):  # pylint: disable=too-few-public-methods
         :type scene_name: str
         """
         if control_name == Control.PLAYER_CONTROL:
-            return ManualControl()
+            return manual.ManualControl()
+        if control_name == Control.PLAYER_PILOT_CONTROL:
+            return manual_pilot.ManualPilotControl()
         if control_name == Control.AI_BEGINNER:
-            return AIBeginner()
+            return ai_beginner.AIBeginner()
+        if control_name == Control.AUTOPILOT:
+            return autopilot.Autopilot()
         else:
             raise ControlFactoryError("Unknown control name")

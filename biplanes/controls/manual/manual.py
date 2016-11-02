@@ -1,28 +1,30 @@
 """Player control"""
 
-from biplanes.controls.base.base import BaseControl
-from biplanes.controls.manual.widgets.clockwise.clockwise import (
-    ClockWiseButton)
-from biplanes.controls.manual.widgets.conterclockwise.conterclockwise import (
-    ConterClockWiseButton)
-from biplanes.controls.manual.widgets.down.down import DownButton
-from biplanes.controls.manual.widgets.fire.fire import FireButton
-from biplanes.controls.manual.widgets.up.up import UpButton
+from biplanes.controls.base import base
+from biplanes.controls.manual.widgets.clockwise import clockwise
+from biplanes.controls.manual.widgets.conterclockwise import conterclockwise
+from biplanes.controls.manual.widgets.down import down
+from biplanes.controls.manual.widgets.eject import eject
+from biplanes.controls.manual.widgets.fire import fire
+from biplanes.controls.manual.widgets.up import up
 
 
-class ManualControl(BaseControl):  # pylint: disable=too-many-ancestors
+# pylint: disable=too-many-ancestors
+# pylint: disable=too-many-instance-attributes
+class ManualControl(base.BaseControl):
     """Control for player"""
 
     def __init__(self, *args, **kwargs):
         super(ManualControl, self).__init__(*args, **kwargs)
-        self._clockwise = ClockWiseButton()
-        self._conterclockwise = ConterClockWiseButton()
-        self._down = DownButton()
-        self._fire = FireButton()
-        self._up = UpButton()
+        self._clockwise = clockwise.ClockWiseButton()
+        self._conterclockwise = conterclockwise.ConterClockWiseButton()
+        self._down = down.DownButton()
+        self._fire = fire.FireButton()
+        self._up = up.UpButton()
+        self._eject = eject.EjectButton()
         self._controls = [
             self._clockwise, self._conterclockwise, self._down,
-            self._fire, self._up]
+            self._fire, self._up, self._eject]
         for control in self._controls:
             self.add_widget(control)
 
