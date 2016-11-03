@@ -1,6 +1,7 @@
 """Standart biplane implementation"""
 
 from kivy import properties
+from kivy import vector
 
 from biplanes.decors import enums as decors_enums
 from biplanes.decors.factory import DecorFactory
@@ -36,7 +37,7 @@ class StandartPlane(BasePlane):
         self.angle = 0 if direction == common_enums.Direction.RIGHT else 180
         self.takeoff_point = 4
         self.max_velocity = 5
-        self.ejection_velocity = 3
+        self.ejection_velocity = 6
         self.max_points = 3
         self.points = 3
         self.acceleration = .15
@@ -70,6 +71,7 @@ class StandartPlane(BasePlane):
             pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
             pilot.angle = self.angle + 90
             pilot.velocity = self.ejection_velocity
+            pilot.center_x, pilot.y = self._get_ejected_pilot_position()
             self.add_item(pilot)
             self.dispatch('on_ejection', pilot)
         self.is_contains_pilot = False
@@ -102,6 +104,21 @@ class StandartPlane(BasePlane):
             self.pos[0] = -plane_length / 2
         if self.center_x < 0:
             self.pos[0] = scene_length - plane_length / 2
+
+    def _get_ejected_pilot_position(self):
+        relative_cabin_coords = (0, self.size[1] / 2)
+        center_to_cabin_vector = vector.Vector(relative_cabin_coords).rotate(
+            self.angle)
+        rotation_delta = (
+            center_to_cabin_vector[0] - relative_cabin_coords[0],
+            center_to_cabin_vector[1] - relative_cabin_coords[1])
+        absolute_cabin_coords = (
+            self.pos[0] + self.size[0] / 2,
+            self.pos[1] + self.size[1])
+        pilot_pos = (
+            absolute_cabin_coords[0] + rotation_delta[0],
+            absolute_cabin_coords[1] + rotation_delta[1])
+        return pilot_pos
 
     def process_collission(self, item):
         if item.has_tags("solid"):

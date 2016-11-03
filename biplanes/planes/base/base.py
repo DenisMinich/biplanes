@@ -13,9 +13,6 @@ from biplanes.base_entity import BaseEntity
 class BasePlane(BaseEntity):
     """Common entity for all planes"""
 
-    takeoff_point = NumericProperty()
-    """Minimal speed to takeoff"""
-
     max_velocity = NumericProperty()
     """Maximal velocity for a plane"""
 
@@ -45,7 +42,13 @@ class BasePlane(BaseEntity):
     @property
     def velocity_vector(self):
         """Vector of plane's velocity"""
-        return Vector(self.velocity, 0).rotate(self.angle)
+        engine_velocity_vector = Vector(self.velocity, 0).rotate(self.angle)
+        if self.is_in_air:
+            gravity_velocity_vector = (
+                Vector(0, -1) * (self.max_velocity - self.velocity))
+        else:
+            gravity_velocity_vector = Vector(0, 0)
+        return engine_velocity_vector + gravity_velocity_vector
 
     acceleration = NumericProperty()
     """How quick plane picks up velocity"""
@@ -152,5 +155,5 @@ class BasePlane(BaseEntity):
 
     def _check_is_in_air(self):
         if not self.is_in_air:
-            if self.velocity > self.takeoff_point:
+            if self.velocity == self.max_velocity:
                 self.is_in_air = True

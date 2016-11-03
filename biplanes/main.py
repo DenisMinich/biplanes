@@ -33,7 +33,7 @@ class BiplanesClassicLevel(Widget):
 
     _objects_to_update = None
 
-    _clock = None
+    _sclock = None
 
     respawn_interval = 1
 
@@ -157,6 +157,7 @@ class BiplanesClassicLevel(Widget):
         pilot.bind(on_kill=self._process_player_pilot_killed)
         pilot.bind(on_achieve=self._process_player_achieved_spawn)
         self.add_item(pilot.control)
+        self.add_item(plane.control)
 
     def _process_player_pilot_killed(self, pilot, cause):
         self.remove_item(pilot)
