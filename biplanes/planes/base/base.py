@@ -108,7 +108,11 @@ class BasePlane(BaseEntity):
 
     def decrease_velocity(self):
         """Decrease plane's velocity by braking value"""
-        self.velocity -= self.braking
+        if self.velocity > 0:
+            if self.velocity < self.braking:
+                self.velocity = 0
+            else:
+                self.velocity -= self.braking
 
     def rotate_clockwise(self):
         """Rotate planes direction clockwise"""

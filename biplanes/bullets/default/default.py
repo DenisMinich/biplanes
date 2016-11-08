@@ -59,7 +59,7 @@ class DefaultBullet(BaseEntity):
         if not in_scene:
             self.remove_item(self)
 
-    def process_collission(self, item):
+    def collide(self, item):
         if item.has_tags("plane") and item.team != self.team:
             item.damage(self.damage)
             self.remove_item(self)

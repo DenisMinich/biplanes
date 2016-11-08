@@ -13,7 +13,7 @@ class Barn(BaseEntity):
     texture = properties.ObjectProperty()
     """Self texture"""
 
-    tags = properties.ListProperty(["solid"])
+    tags = properties.ListProperty(["solid", "spawn"])
     """Tags for object"""
 
     def __init__(self, *args, **kwargs):

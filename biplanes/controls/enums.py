@@ -6,5 +6,6 @@ class Control(object):  # pylint: disable=too-few-public-methods
     AUTOPILOT = 'autopilot'
     PLAYER_CONTROL = 'player control'
     PLAYER_PILOT_CONTROL = 'pilot player control'
+    PLAYER_RUNNER_CONTROL = 'player runner control'
     AI_BEGINNER = 'ai beginner'
     AI_BEGINNER_PILOT = 'ai beginner pilot'

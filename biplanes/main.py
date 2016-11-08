@@ -76,8 +76,8 @@ class BiplanesClassicLevel(Widget):
         for index, inner_object in enumerate(level_objects):
             for another_object in level_objects[index:]:
                 if inner_object.collide_widget(another_object):
-                    inner_object.process_collission(another_object)
-                    another_object.process_collission(inner_object)
+                    inner_object.collide(another_object)
+                    another_object.collide(inner_object)
 
     def on_item_added(self, _, item):
         """Callback on new item added"""
@@ -155,7 +155,7 @@ class BiplanesClassicLevel(Widget):
         pilot.control = ControlFactory.get_control(
             Control.PLAYER_PILOT_CONTROL)
         pilot.bind(on_kill=self._process_player_pilot_killed)
-        pilot.bind(on_achieve=self._process_player_achieved_spawn)
+        pilot.bind(on_landed=self._process_player_pilot_landed)
         self.add_item(pilot.control)
         self.add_item(plane.control)
 
@@ -165,7 +165,15 @@ class BiplanesClassicLevel(Widget):
         if cause:
             pass
 
-    def _process_player_achieved_spawn(self, pilot):
+    def _process_player_pilot_landed(self, pilot):
+        self.remove_item(pilot.control)
+        pilot.control = ControlFactory.get_control(
+            Control.PLAYER_RUNNER_CONTROL)
+        pilot.bind(on_kill=self._process_player_pilot_killed)
+        pilot.bind(on_reach_spawn=self._process_player_reached_spawn)
+        self.add_item(pilot.control)
+
+    def _process_player_reached_spawn(self, pilot):
         self.remove_item(pilot)
         self.remove_item(pilot.control)
         self._create_player_plane()

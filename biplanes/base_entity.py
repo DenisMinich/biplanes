@@ -43,6 +43,6 @@ class BaseEntity(Tagable):
         """Method called if entity should be removed"""
         pass
 
-    def process_collission(self, item):
+    def collide(self, item):
         """Process collision of entity with item"""
         pass

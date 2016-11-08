@@ -20,7 +20,7 @@ class Movable(BaseEntity):
         """Vector of velocity"""
         return vector.Vector(self.velocity, 0).rotate(self.angle)
 
-    def move(self):
+    def _move(self):
         """Update object's position based on it's velocity"""
         self.pos = (
             self.pos[0] + self.velocity_vector[0],

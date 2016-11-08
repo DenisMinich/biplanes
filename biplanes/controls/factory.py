@@ -6,6 +6,7 @@ from biplanes.controls.enums import Control
 from biplanes.controls.exceptions import ControlFactoryError
 from biplanes.controls.manual import manual
 from biplanes.controls.manual_pilot import manual_pilot
+from biplanes.controls.manual_runner import manual_runner
 
 
 class ControlFactory(object):  # pylint: disable=too-few-public-methods
@@ -22,6 +23,8 @@ class ControlFactory(object):  # pylint: disable=too-few-public-methods
             return manual.ManualControl()
         if control_name == Control.PLAYER_PILOT_CONTROL:
             return manual_pilot.ManualPilotControl()
+        if control_name == Control.PLAYER_RUNNER_CONTROL:
+            return manual_runner.ManualRunnerControl()
         if control_name == Control.AI_BEGINNER:
             return ai_beginner.AIBeginner()
         if control_name == Control.AUTOPILOT:

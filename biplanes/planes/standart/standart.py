@@ -120,6 +120,6 @@ class StandartPlane(BasePlane):
             absolute_cabin_coords[1] + rotation_delta[1])
         return pilot_pos
 
-    def process_collission(self, item):
+    def collide(self, item):
         if item.has_tags("solid"):
             self.destroy(self.DEATH_CRASH)
