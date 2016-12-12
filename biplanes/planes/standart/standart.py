@@ -6,8 +6,6 @@ from kivy import vector
 from biplanes.decors import enums as decors_enums
 from biplanes.decors.factory import DecorFactory
 from biplanes import enums as common_enums
-from biplanes.pilots import enums as pilots_enums
-from biplanes.pilots.factory import PilotFactory
 from biplanes.planes.base.base import BasePlane
 
 
@@ -25,6 +23,8 @@ class StandartPlane(BasePlane):
     texture_critical_damaged = properties.ObjectProperty()
 
     scene = properties.ObjectProperty()
+
+    pilot = properties.ObjectProperty()
 
     direction = properties.StringProperty(common_enums.Direction.RIGHT)
 
@@ -68,12 +68,13 @@ class StandartPlane(BasePlane):
     def eject(self):
         """Catapult pilot"""
         if self.is_contains_pilot:
-            pilot = PilotFactory.get_pilot(pilots_enums.PilotModel.DEFAULT)
-            pilot.angle = self.angle + 90
-            pilot.velocity = self.ejection_velocity
-            pilot.center_x, pilot.y = self._get_ejected_pilot_position()
-            self.add_item(pilot)
-            self.dispatch('on_ejection', pilot)
+            self.pilot.center_x, self.pilot.y = (
+                self._get_ejected_pilot_position())
+            self.pilot.initial_velocity = vector.Vector(
+                self.ejection_velocity, 0).rotate(self.angle + 90)
+            self.add_item(self.pilot)
+            self.add_item(self.pilot.parachute)
+            self.dispatch('on_ejection', self.pilot)
         self.is_contains_pilot = False
 
     def destroy(self, cause):

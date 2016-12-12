@@ -73,14 +73,15 @@ class DefaultGun(BaseEntity):
 
     def _create_bullet(self):
         """Creates instance of bullet"""
-        relative_mazzle_coords = (self.plane.size[0] / 2, 0)
+        plane_offset = 5  # used to prevent self-damaging exact after fire
+        relative_mazzle_coords = (self.plane.size[0] / 2 + plane_offset, 0)
         center_to_muzzle_vector = Vector(relative_mazzle_coords).rotate(
             self.plane.angle)
         rotation_delta = (
             center_to_muzzle_vector[0] - relative_mazzle_coords[0],
             center_to_muzzle_vector[1] - relative_mazzle_coords[1])
         absolute_mazzle_coords = (
-            self.plane.pos[0] + self.plane.size[0],
+            self.plane.pos[0] + self.plane.size[0] + plane_offset,
             self.plane.pos[1] + self.plane.size[1] / 2)
         bullet_pos = (
             absolute_mazzle_coords[0] + rotation_delta[0],

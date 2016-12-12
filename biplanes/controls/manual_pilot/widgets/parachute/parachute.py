@@ -16,11 +16,9 @@ class ParachuteButton(BaseButton):
             disconnecting parachute after it was just opened
             because of player hasn't released button
         """
-        if self.touched and self._untouched:
-            if self._target.with_parachute:
-                self._target.disconnect_parachute()
-            elif self._target.has_parachute:
-                self._target.open_parachute()
-            self._untouched = False
+        if self.touched:
+            if self._untouched:
+                self._target.parachute.pull_the_ring()
+                self._untouched = False
         else:
             self._untouched = True

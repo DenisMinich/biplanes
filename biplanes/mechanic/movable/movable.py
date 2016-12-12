@@ -6,22 +6,21 @@ from kivy import vector
 from biplanes.base_entity import BaseEntity
 
 
-class Movable(BaseEntity):
+class Movable(BaseEntity):  # pylint: disable=too-many-ancestors
     """Extends widget with movement traits"""
 
     angle = properties.NumericProperty()
     """Rotation angle"""
 
-    velocity = properties.NumericProperty()
+    def get_velocity(self):  # pylint: disable=no-self-use
+        """Vector of velocity"""
+        return vector.Vector(0, 0)
+
+    velocity = properties.AliasProperty(get_velocity)
     """Movement velocity"""
 
-    @property
-    def velocity_vector(self):
-        """Vector of velocity"""
-        return vector.Vector(self.velocity, 0).rotate(self.angle)
-
-    def _move(self):
+    def move(self):
         """Update object's position based on it's velocity"""
         self.pos = (
-            self.pos[0] + self.velocity_vector[0],
-            self.pos[1] + self.velocity_vector[1])
+            self.pos[0] + self.velocity[0],
+            self.pos[1] + self.velocity[1])

@@ -1,9 +1,10 @@
 """BaseEntity implementation"""
 
-from biplanes.tags.tagable import Tagable
+from biplanes.mechanic.affectable import affectable
+from biplanes.tags import tagable
 
 
-class BaseEntity(Tagable):
+class BaseEntity(tagable.Tagable, affectable.Affectable):
     """Base class for item on scene
 
     Main purpose: be sure that every object on level has 2 basic events:

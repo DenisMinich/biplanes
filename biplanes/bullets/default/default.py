@@ -60,7 +60,10 @@ class DefaultBullet(BaseEntity):
             self.remove_item(self)
 
     def collide(self, item):
-        if item.has_tags("plane") and item.team != self.team:
+        if item.has_tags("plane"):
+            item.damage(self.damage)
+            self.remove_item(self)
+        if item.has_tags("parachute"):
             item.damage(self.damage)
             self.remove_item(self)
         if item.has_tags("solid"):

@@ -5,6 +5,7 @@ import os
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy import logger
 from kivy import properties
 from kivy.resources import resource_add_path
 from kivy.uix.widget import Widget
@@ -16,6 +17,10 @@ from biplanes.decors.factory import DecorFactory
 from biplanes import enums as common_enums
 from biplanes.guns.enums import GunModel
 from biplanes.guns.factory import GunFactory
+from biplanes.parachutes import enums as parachute_enums
+from biplanes.parachutes import factory as parachute_factory
+from biplanes.pilots import enums as pilot_enums
+from biplanes.pilots import factory as pilot_factory
 from biplanes.planes import enums as planes_enums
 from biplanes.planes.factory import PlaneFactory
 from biplanes.scenes import enums as scenes_enums
@@ -81,6 +86,7 @@ class BiplanesClassicLevel(Widget):
 
     def on_item_added(self, _, item):
         """Callback on new item added"""
+        logger.Logger.info('Main: New item added to the scene: %s' % item)
         self.add_item(item)
 
     def on_item_removed(self, _, item):
@@ -133,7 +139,13 @@ class BiplanesClassicLevel(Widget):
         blue_plane.bind(on_ejection=self._process_player_plane_ejected)
         blue_plane.control = ControlFactory.get_control(
             Control.PLAYER_CONTROL)
-        blue_plane.gun = GunFactory.get_gun(GunModel.DEFAULT, plane=blue_plane)
+        blue_plane.gun = GunFactory.get_gun(
+            GunModel.DEFAULT, plane=blue_plane)
+        pilot = pilot_factory.PilotFactory.get_pilot(
+            pilot_enums.PilotModel.DEFAULT)
+        pilot.parachute = parachute_factory.Factory.get(
+            parachute_enums.Model.DEFAULT, pilot=pilot)
+        blue_plane.pilot = pilot
         self.add_item(blue_plane)
         self.add_item(blue_plane.control)
         self.add_item(blue_plane.gun)
@@ -152,8 +164,8 @@ class BiplanesClassicLevel(Widget):
     def _process_player_plane_ejected(self, plane, pilot):
         self.remove_item(plane.control)
         plane.control = ControlFactory.get_control(Control.AUTOPILOT)
-        pilot.control = ControlFactory.get_control(
-            Control.PLAYER_PILOT_CONTROL)
+        pilot.assign_control(ControlFactory.get_control(
+            Control.PLAYER_PILOT_CONTROL))
         pilot.bind(on_kill=self._process_player_pilot_killed)
         pilot.bind(on_landed=self._process_player_pilot_landed)
         self.add_item(pilot.control)
@@ -167,8 +179,8 @@ class BiplanesClassicLevel(Widget):
 
     def _process_player_pilot_landed(self, pilot):
         self.remove_item(pilot.control)
-        pilot.control = ControlFactory.get_control(
-            Control.PLAYER_RUNNER_CONTROL)
+        pilot.assign_control(ControlFactory.get_control(
+            Control.PLAYER_RUNNER_CONTROL))
         pilot.bind(on_kill=self._process_player_pilot_killed)
         pilot.bind(on_reach_spawn=self._process_player_reached_spawn)
         self.add_item(pilot.control)

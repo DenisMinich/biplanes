@@ -7,4 +7,6 @@ class LeftButton(BaseButton):
     """Tilt pilot to the left"""
 
     def update(self):
-        self._target.tilt_left = self.touched
+        if self._target.parachute is not None:
+            if self._target.parachute.canopy is not None:
+                self._target.parachute.canopy.is_tilted_left = self.touched
